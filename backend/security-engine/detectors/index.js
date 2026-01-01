@@ -1,6 +1,7 @@
 import { detectSQLInjection } from "./sqlInjection.js";
 import { detectXSS } from "./xss.js";
 import { detectHardcodedSecrets } from "./hardcodedSecrets.js";
+import { detectCodeQualityIssues } from "./quality.js";
 
 /**
  * Runs all vulnerability detectors against normalized input.
@@ -33,6 +34,13 @@ export function runAllDetectors(normalizedInput) {
     if (Array.isArray(secretFindings)) findings.push(...secretFindings);
   } catch (error) {
     console.error("Hardcoded Secrets detector failed:", error.message);
+  }
+
+  try {
+    const qualityFindings = detectCodeQualityIssues(normalizedInput);
+    if (Array.isArray(qualityFindings)) findings.push(...qualityFindings);
+  } catch (error) {
+    console.error("Code Quality detector failed:", error.message);
   }
 
   return findings;

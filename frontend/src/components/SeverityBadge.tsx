@@ -1,32 +1,93 @@
+import React from "react";
+// Ensure this import path matches your project structure
+// If 'Severity' isn't defined in types, you can remove the import and use string type below
 import type { Severity } from "../types/analysis";
 
 interface SeverityBadgeProps {
-  severity: Severity;
+  severity: Severity | string;
 }
 
 export const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
-  const getSeverityStyles = (severity: Severity) => {
-    switch (severity) {
+  // Logic: Advanced styling maps for Glass + Glow effects
+  const getStyles = (sev: string) => {
+    const s = sev.toUpperCase();
+    switch (s) {
       case "LOW":
-        return "bg-green-100 text-green-800 border-green-300";
+        return {
+          container: "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 shadow-emerald-500/10",
+          dot: "bg-emerald-500",
+          ring: "group-hover:ring-emerald-500/30",
+          shimmer: "via-emerald-400/20"
+        };
       case "MEDIUM":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+        return {
+          container: "bg-amber-500/10 border-amber-500/20 text-amber-700 shadow-amber-500/10",
+          dot: "bg-amber-500",
+          ring: "group-hover:ring-amber-500/30",
+          shimmer: "via-amber-400/20"
+        };
       case "HIGH":
-        return "bg-orange-100 text-orange-800 border-orange-300";
+        return {
+          container: "bg-orange-500/10 border-orange-500/20 text-orange-700 shadow-orange-500/10",
+          dot: "bg-orange-500",
+          ring: "group-hover:ring-orange-500/30",
+          shimmer: "via-orange-400/20"
+        };
       case "CRITICAL":
-        return "bg-red-100 text-red-800 border-red-300";
+        return {
+          container: "bg-rose-500/10 border-rose-500/20 text-rose-700 shadow-rose-500/10",
+          dot: "bg-rose-600",
+          ring: "group-hover:ring-rose-500/30",
+          shimmer: "via-rose-400/20"
+        };
       default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
+        return {
+          container: "bg-slate-500/10 border-slate-500/20 text-slate-700 shadow-slate-500/10",
+          dot: "bg-slate-500",
+          ring: "group-hover:ring-slate-500/30",
+          shimmer: "via-slate-400/20"
+        };
     }
   };
 
+  const styles = getStyles(typeof severity === 'string' ? severity : 'LOW');
+
   return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getSeverityStyles(
-        severity
-      )}`}
-    >
-      {severity}
-    </span>
+    <>
+      {/* CSS Animation Injection */}
+      <style>{`
+        @keyframes shimmer-slide {
+          0% { transform: translateX(-150%) skewX(-20deg); }
+          100% { transform: translateX(200%) skewX(-20deg); }
+        }
+      `}</style>
+
+      <span
+        className={`
+          group relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full 
+          text-[11px] font-black uppercase tracking-widest border 
+          backdrop-blur-md shadow-sm transition-all duration-300 ease-out
+          hover:scale-105 hover:shadow-md cursor-default select-none
+          ring-1 ring-transparent ${styles.ring}
+          ${styles.container}
+        `}
+      >
+        {/* Shimmer Effect Overlay */}
+        <div className="absolute inset-0 overflow-hidden rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+           <div className={`absolute inset-0 w-full h-full bg-gradient-to-r from-transparent ${styles.shimmer} to-transparent animate-[shimmer-slide_1.5s_infinite]`}></div>
+        </div>
+
+        {/* Status Beacon (Pulsing Dot) */}
+        <span className="relative flex h-2 w-2">
+          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${styles.dot}`}></span>
+          <span className={`relative inline-flex rounded-full h-2 w-2 ${styles.dot}`}></span>
+        </span>
+
+        {/* Text Content */}
+        <span className="relative z-10 font-bold">
+          {severity}
+        </span>
+      </span>
+    </>
   );
 };

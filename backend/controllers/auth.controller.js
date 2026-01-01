@@ -72,12 +72,53 @@ export const googleLogin = async (req, res) => {
       user: user.toPublicProfile(),
     });
   } catch (error) {
-    console.error("Google login error:", error.message);
+    console.error("Google login error:", error);
+    console.error("Stack:", error.stack);
 
     res.status(401).json({
       success: false,
       message: "Authentication failed",
     });
+  }
+};
+
+/**
+ * ------------------------------------------------------
+ * POST /api/auth/dev-login
+ * Bypass for local development
+ * ------------------------------------------------------
+ */
+export const devLogin = async (req, res) => {
+  if (process.env.NODE_ENV !== "development") {
+    return res.status(403).json({ success: false, message: "Dev mode only" });
+  }
+
+  try {
+    // Create or get Dev User
+    let user = await User.findOne({ googleId: "dev-user-id" });
+
+    if (!user) {
+      user = await User.create({
+        googleId: "dev-user-id",
+        email: "dev@vulnexa.local",
+        name: "Dev Administrator",
+        avatar: "",
+        onboarded: true,
+        active: true,
+        lastLogin: new Date(),
+      });
+    }
+
+    const token = generateJWT(user._id.toString());
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: user.toPublicProfile(),
+    });
+  } catch (error) {
+    console.error("Dev login error:", error);
+    res.status(500).json({ success: false, message: "Dev login failed" });
   }
 };
 

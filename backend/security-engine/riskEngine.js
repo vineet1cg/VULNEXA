@@ -1,4 +1,5 @@
 import { SEVERITY_WEIGHTS } from "./utils/constants.js";
+import { normalizeSeverity } from "./utils/normalizeSeverity.js";
 
 /**
  * RISK ENGINE
@@ -13,7 +14,9 @@ export function calculateRiskScore(vulnerabilities = []) {
   }
 
   const totalWeight = vulnerabilities.reduce((sum, vuln) => {
-    const weight = SEVERITY_WEIGHTS[vuln?.severity] || 0;
+    // Normalize severity to ensure it matches specific casing in SEVERITY_WEIGHTS (e.g. "CRITICAL" -> "Critical")
+    const safeSeverity = normalizeSeverity(vuln?.severity);
+    const weight = SEVERITY_WEIGHTS[safeSeverity] || 0;
     return sum + weight;
   }, 0);
 
@@ -24,7 +27,7 @@ export function calculateRiskScore(vulnerabilities = []) {
    * - Still rewards severity
    */
   const maxPossible =
-    vulnerabilities.length * SEVERITY_WEIGHTS.CRITICAL;
+    vulnerabilities.length * SEVERITY_WEIGHTS.Critical;
 
   const normalizedScore = (totalWeight / maxPossible) * 100;
 

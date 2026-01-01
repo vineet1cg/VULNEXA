@@ -4,6 +4,7 @@ import rateLimit from "express-rate-limit";
 import authenticateToken from "../middleware/auth.middleware.js";
 import {
   googleLogin,
+  devLogin,
   completeOnboarding,
   getCurrentUser,
   logout,
@@ -32,6 +33,9 @@ const strictLimiter = rateLimit({
 
 // Google OAuth login
 router.post("/google", authLimiter, googleLogin);
+
+// Dev Login (Bypass)
+router.post("/dev-login", devLogin);
 
 // Get current authenticated user
 router.get("/me", authenticateToken, getCurrentUser);

@@ -41,6 +41,6 @@ export const analysisApi = {
   // -----------------------------
   getDashboardMetrics: async (): Promise<DashboardMetrics> => {
     const response = await api.get("/api/dashboard/metrics");
-    return response.data;
+    return response.data.metrics;
   },
 };

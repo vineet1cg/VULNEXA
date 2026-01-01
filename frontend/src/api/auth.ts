@@ -13,6 +13,11 @@ export const authApi = {
     return data;
   },
 
+  devLogin: async (): Promise<GoogleLoginResponse> => {
+    const { data } = await api.post<GoogleLoginResponse>("/api/auth/dev-login");
+    return data;
+  },
+
   getCurrentUser: async (): Promise<CurrentUserResponse> => {
     const { data } = await api.get<CurrentUserResponse>("/api/auth/me");
     return data;
