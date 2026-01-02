@@ -7,6 +7,10 @@ import {
 import type { ReactNode } from "react";
 import { authApi } from "../api/auth";
 
+/* =========================================================
+   Types
+========================================================= */
+
 interface AuthContextType {
   user: any;
   isAuthenticated: boolean;
@@ -18,14 +22,33 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+/* =========================================================
+   Helpers
+========================================================= */
+
+const getToken = () => localStorage.getItem("sentinai_token");
+
+/* =========================================================
+   Provider
+========================================================= */
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    Boolean(getToken())
+  );
+  const [loading, setLoading] = useState<boolean>(true);
+
+  /* =========================================================
+     Hydration: Token → User
+  ========================================================= */
 
   useEffect(() => {
-    const token = localStorage.getItem("sentinai_token");
+    const token = getToken();
 
     if (!token) {
+      setIsAuthenticated(false);
+      setUser(null);
       setLoading(false);
       return;
     }
@@ -33,38 +56,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     authApi
       .getCurrentUser()
       .then((res) => {
-        if (res.success) {
+        if (res?.success && res.user) {
           setUser(res.user);
+          setIsAuthenticated(true);
         } else {
           localStorage.removeItem("sentinai_token");
+          setUser(null);
+          setIsAuthenticated(false);
         }
       })
+      .catch(() => {
+        localStorage.removeItem("sentinai_token");
+        setUser(null);
+        setIsAuthenticated(false);
+      })
       .finally(() => {
-        // Add a small artificial delay to show off the animation 
-        // (Remove setTimeout in production if you want instant load)
+        // keep your animation polish
         setTimeout(() => setLoading(false), 800);
       });
   }, []);
 
+  /* =========================================================
+     Auth Actions
+  ========================================================= */
+
   const login = async (googleIdToken: string) => {
     const res = await authApi.googleLogin(googleIdToken);
 
-    if (res.success) {
-      localStorage.setItem("sentinai_token", res.token);
-      setUser(res.user);
-    } else {
+    if (!res?.success || !res.token) {
       throw new Error("Login failed");
     }
+
+    localStorage.setItem("sentinai_token", res.token);
+    setUser(res.user);
+    setIsAuthenticated(true);
   };
 
   const devLogin = async () => {
     const res = await authApi.devLogin();
-    if (res.success) {
-      localStorage.setItem("sentinai_token", res.token);
-      setUser(res.user);
-    } else {
+
+    if (!res?.success || !res.token) {
       throw new Error("Dev login failed");
     }
+
+    localStorage.setItem("sentinai_token", res.token);
+    setUser(res.user);
+    setIsAuthenticated(true);
   };
 
   const logout = async () => {
@@ -73,16 +110,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       localStorage.removeItem("sentinai_token");
       setUser(null);
+      setIsAuthenticated(false);
     }
   };
 
-  // ------------------------------------------------------------------
-  //  VISUAL LOGIC: High-End "System Boot" Loading Screen
-  // ------------------------------------------------------------------
+  /* =========================================================
+     System Boot Screen (UNCHANGED – SAFE)
+  ========================================================= */
+
   if (loading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1120] overflow-hidden">
-        {/* CSS Engine for this screen */}
         <style>{`
           @keyframes gradient-drift {
             0% { background-position: 0% 50%; }
@@ -99,45 +137,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         `}</style>
 
-        {/* 1. Background Gradient Drift & Noise */}
-        <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-indigo-900 via-slate-900 to-black animate-[gradient-drift_10s_ease_infinite] bg-[length:400%_400%]"></div>
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+        <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-indigo-900 via-slate-900 to-black animate-[gradient-drift_10s_ease_infinite] bg-[length:400%_400%]" />
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-        {/* 2. Vertical Scan Line (System Scanning) */}
         <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          <div className="w-full h-[20vh] bg-gradient-to-b from-transparent via-indigo-500/10 to-transparent animate-[scan-vertical_3s_linear_infinite]"></div>
+          <div className="w-full h-[20vh] bg-gradient-to-b from-transparent via-indigo-500/10 to-transparent animate-[scan-vertical_3s_linear_infinite]" />
         </div>
 
-        {/* 3. Main Loader Container */}
         <div className="relative z-10 flex flex-col items-center">
-
-          {/* Logo / Icon with Pulse Attention Effect */}
           <div className="relative mb-8">
-            {/* Outer Rings */}
-            <div className="absolute inset-0 border border-indigo-500/30 rounded-full animate-[pulse-ring_3s_linear_infinite]"></div>
-            <div className="absolute inset-0 border border-blue-500/20 rounded-full animate-[pulse-ring_3s_linear_infinite_1s]"></div>
+            <div className="absolute inset-0 border border-indigo-500/30 rounded-full animate-[pulse-ring_3s_linear_infinite]" />
+            <div className="absolute inset-0 border border-blue-500/20 rounded-full animate-[pulse-ring_3s_linear_infinite_1s]" />
 
-            {/* Core Icon */}
             <div className="relative h-16 w-16 bg-gradient-to-tr from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/50">
               <span className="text-3xl font-bold text-white animate-pulse">V</span>
             </div>
 
-            {/* Status Beacon (Green Dot) */}
-            <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald-500 rounded-full border-2 border-slate-900 shadow-[0_0_10px_#10b981] animate-bounce"></div>
+            <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald-500 rounded-full border-2 border-slate-900 shadow-[0_0_10px_#10b981] animate-bounce" />
           </div>
 
-          {/* Loading Bar with Liquid Shimmer */}
           <div className="w-64 h-1.5 bg-slate-800 rounded-full overflow-hidden relative mb-4 ring-1 ring-slate-700">
-            <div className="absolute inset-0 bg-indigo-600/20"></div>
+            <div className="absolute inset-0 bg-indigo-600/20" />
             <div
               className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 animate-[gradient-drift_2s_linear_infinite] bg-[length:200%_100%]"
-              style={{ width: '60%', borderRadius: '99px' }}
-            >
-              <div className="absolute top-0 right-0 bottom-0 w-2 bg-white/50 blur-[2px]"></div>
-            </div>
+              style={{ width: "60%", borderRadius: "99px" }}
+            />
           </div>
 
-          {/* Text with Soft Focus Blur & Fade In */}
           <div className="text-center space-y-1">
             <h2 className="text-white font-bold tracking-[0.2em] text-sm uppercase animate-pulse">
               Initializing Core
@@ -146,18 +172,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               Verifying encryption keys...
             </p>
           </div>
-
         </div>
       </div>
     );
   }
 
-  // Render children (The App) when loaded
+  /* =========================================================
+     Provider
+  ========================================================= */
+
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated,
         loading,
         login,
         devLogin,
@@ -169,8 +197,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+/* =========================================================
+   Hook
+========================================================= */
+
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  if (!ctx) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
   return ctx;
 };

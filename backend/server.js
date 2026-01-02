@@ -11,6 +11,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import analysisRoutes from "./routes/analysis.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
+import systemRoutes from "./routes/system.routes.js";
 
 /* --------------------------------------------------
  * Environment Setup
@@ -48,6 +49,11 @@ app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+/* --------------------------------------------------
+ * System Routes
+ * -------------------------------------------------- */
+app.use("/api/system", systemRoutes);
 
 /* --------------------------------------------------
  * Health & Meta

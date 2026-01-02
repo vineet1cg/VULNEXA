@@ -75,7 +75,7 @@ export const LoginPage = () => {
               />
             </div>
             {/* DEV LOGIN BYPASS */}
-            <div className="flex justify-center pt-4 border-t border-white/5 mt-4">
+            {/* <div className="flex justify-center pt-4 border-t border-white/5 mt-4">
               <button
                 onClick={async () => {
                   try {
@@ -89,7 +89,7 @@ export const LoginPage = () => {
               >
                 [ BYPASS_AUTH_PROTOCOL ]
               </button>
-            </div>
+            </div> */}
           </div>
 
           <div className="flex justify-between items-center text-[10px] text-gray-600 font-mono uppercase">

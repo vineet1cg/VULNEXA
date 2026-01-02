@@ -10,9 +10,7 @@ export const analysisApi = {
   // -----------------------------
   // POST /api/analyze
   // -----------------------------
-  analyze: async (
-    payload: AnalysisRequest
-  ): Promise<AnalysisResult> => {
+  analyze: async (payload: AnalysisRequest): Promise<AnalysisResult> => {
     const response = await api.post("/api/analyze", payload);
 
     // Backend already returns a full analysis object

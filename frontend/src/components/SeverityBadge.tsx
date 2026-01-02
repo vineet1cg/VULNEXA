@@ -14,43 +14,48 @@ export const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
     switch (s) {
       case "LOW":
         return {
-          container: "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 shadow-emerald-500/10",
+          container:
+            "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 shadow-emerald-500/10",
           dot: "bg-emerald-500",
           ring: "group-hover:ring-emerald-500/30",
-          shimmer: "via-emerald-400/20"
+          shimmer: "via-emerald-400/20",
         };
       case "MEDIUM":
         return {
-          container: "bg-amber-500/10 border-amber-500/20 text-amber-700 shadow-amber-500/10",
+          container:
+            "bg-amber-500/10 border-amber-500/20 text-amber-700 shadow-amber-500/10",
           dot: "bg-amber-500",
           ring: "group-hover:ring-amber-500/30",
-          shimmer: "via-amber-400/20"
+          shimmer: "via-amber-400/20",
         };
       case "HIGH":
         return {
-          container: "bg-orange-500/10 border-orange-500/20 text-orange-700 shadow-orange-500/10",
+          container:
+            "bg-orange-500/10 border-orange-500/20 text-orange-700 shadow-orange-500/10",
           dot: "bg-orange-500",
           ring: "group-hover:ring-orange-500/30",
-          shimmer: "via-orange-400/20"
+          shimmer: "via-orange-400/20",
         };
       case "CRITICAL":
         return {
-          container: "bg-rose-500/10 border-rose-500/20 text-rose-700 shadow-rose-500/10",
+          container:
+            "bg-rose-500/10 border-rose-500/20 text-rose-700 shadow-rose-500/10",
           dot: "bg-rose-600",
           ring: "group-hover:ring-rose-500/30",
-          shimmer: "via-rose-400/20"
+          shimmer: "via-rose-400/20",
         };
       default:
         return {
-          container: "bg-slate-500/10 border-slate-500/20 text-slate-700 shadow-slate-500/10",
+          container:
+            "bg-slate-500/10 border-slate-500/20 text-slate-700 shadow-slate-500/10",
           dot: "bg-slate-500",
           ring: "group-hover:ring-slate-500/30",
-          shimmer: "via-slate-400/20"
+          shimmer: "via-slate-400/20",
         };
     }
   };
 
-  const styles = getStyles(typeof severity === 'string' ? severity : 'LOW');
+  const styles = getStyles(typeof severity === "string" ? severity : "LOW");
 
   return (
     <>
@@ -74,19 +79,23 @@ export const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
       >
         {/* Shimmer Effect Overlay */}
         <div className="absolute inset-0 overflow-hidden rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-           <div className={`absolute inset-0 w-full h-full bg-gradient-to-r from-transparent ${styles.shimmer} to-transparent animate-[shimmer-slide_1.5s_infinite]`}></div>
+          <div
+            className={`absolute inset-0 w-full h-full bg-gradient-to-r from-transparent ${styles.shimmer} to-transparent animate-[shimmer-slide_1.5s_infinite]`}
+          ></div>
         </div>
 
         {/* Status Beacon (Pulsing Dot) */}
         <span className="relative flex h-2 w-2">
-          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${styles.dot}`}></span>
-          <span className={`relative inline-flex rounded-full h-2 w-2 ${styles.dot}`}></span>
+          <span
+            className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${styles.dot}`}
+          ></span>
+          <span
+            className={`relative inline-flex rounded-full h-2 w-2 ${styles.dot}`}
+          ></span>
         </span>
 
         {/* Text Content */}
-        <span className="relative z-10 font-bold">
-          {severity}
-        </span>
+        <span className="relative z-10 font-bold">{severity}</span>
       </span>
     </>
   );

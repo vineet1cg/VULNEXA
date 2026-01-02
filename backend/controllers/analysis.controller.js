@@ -7,6 +7,7 @@ import User from "../models/User.js";
 /* ---------------- Security Engine ---------------- */
 import { analyzeInput } from "../security-engine/index.js";
 import { normalizeSeverity } from "../security-engine/utils/normalizeSeverity.js";
+import { calculateRiskScore } from "../security-engine/riskEngine.js";
 
 /* --------------------------------------------------
  * Constants
@@ -70,36 +71,35 @@ export const analyzeCode = async (req, res) => {
 
     const {
       vulnerabilities = [],
-      riskScore,
       attackerView = [],
       defenderFixes = [],
       payloads = [],
       impactAnalysis = null,
-      processingTime,
+      processingTime = 0,
     } = engineResult;
 
-    /* ---------- Normalize for DB ---------- */
-    const enrichedVulnerabilities = vulnerabilities.map((v, i) => ({
+    /* ---------- Normalize Vulnerabilities ---------- */
+    const normalizedVulnerabilities = vulnerabilities.map((v, i) => ({
       id: `vuln-${Date.now()}-${i}`,
       name: v.type,
-      severity: normalizeSeverity(v.severity), // 🔑 enum-safe
+      severity: normalizeSeverity(v.severity), // enum-safe
       description: v.description,
       attackerLogic: attackerView[i]?.abuseLogic || null,
       defenderLogic: defenderFixes[i]?.secureFix || null,
       secureCodeFix: defenderFixes[i]?.secureExample || null,
     }));
 
-    const safeRiskScore = Number.isFinite(riskScore) ? riskScore : 0;
-    const safeProcessingTime = Number(processingTime) || 0;
+    /* ---------- Risk Score (DAMPENED MODEL) ---------- */
+    const overallRiskScore = calculateRiskScore(normalizedVulnerabilities);
 
-    /* ---------- Persist ---------- */
+    /* ---------- Persist Analysis ---------- */
     const analysis = await Analysis.create({
       userId,
       inputType,
       contentHash: hashContent(content),
-      overallRiskScore: safeRiskScore,
-      vulnerabilities: enrichedVulnerabilities,
-      processingTime: safeProcessingTime,
+      overallRiskScore,
+      vulnerabilities: normalizedVulnerabilities,
+      processingTime: Number(processingTime) || 0,
       analysisDate: new Date(),
     });
 
@@ -114,14 +114,14 @@ export const analyzeCode = async (req, res) => {
       analysis: {
         id: analysis._id,
         inputType,
-        overallRiskScore: safeRiskScore,
-        vulnerabilities: enrichedVulnerabilities,
+        overallRiskScore,
+        vulnerabilities: normalizedVulnerabilities,
         attackerView,
         defenderFixes,
         simulatedPayloads: payloads,
         impactAnalysis,
         analysisDate: analysis.analysisDate,
-        processingTime: safeProcessingTime,
+        processingTime: analysis.processingTime,
       },
     });
   } catch (error) {

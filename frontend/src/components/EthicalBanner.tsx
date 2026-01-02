@@ -69,21 +69,19 @@ export const EthicalBanner = () => {
         }
       `}</style>
 
-      <div 
+      <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         className="banner-3d-container relative w-full mb-8 group perspective-[2000px] z-10"
       >
         <div className="banner-float-layer relative transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:scale-[1.01]">
-          
           {/* 1. GLASS BACKGROUND & BORDER */}
           <div className="relative overflow-hidden rounded-2xl border border-white/40 bg-white/60 backdrop-blur-xl shadow-lg transition-all duration-500 group-hover:shadow-[0_20px_60px_-15px_rgba(245,158,11,0.3)] group-hover:border-amber-400/50">
-            
             {/* 2. DYNAMIC SPOTLIGHT (Follows Mouse) */}
-            <div 
+            <div
               className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
-                background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.6), transparent 40%)`
+                background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.6), transparent 40%)`,
               }}
             />
 
@@ -93,13 +91,21 @@ export const EthicalBanner = () => {
 
             {/* 4. CONTENT LAYOUT */}
             <div className="relative p-6 flex items-start gap-6">
-              
               {/* Animated Icon */}
               <div className="relative flex-shrink-0">
                 <div className="absolute inset-0 bg-amber-400 rounded-full blur-md opacity-20 animate-pulse"></div>
                 <div className="relative p-3 bg-gradient-to-br from-white to-amber-50 rounded-xl shadow-md border border-amber-100 text-amber-600 ring-1 ring-amber-500/10 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               </div>
@@ -110,7 +116,7 @@ export const EthicalBanner = () => {
                   <h3 className="text-base font-bold text-slate-900 tracking-tight group-hover:text-amber-700 transition-colors">
                     {notice.title}
                   </h3>
-                  
+
                   {/* Glowing Badge */}
                   <span className="relative inline-flex h-5 items-center justify-center rounded-full bg-amber-100 px-2.5 text-[10px] font-black uppercase tracking-widest text-amber-700 ring-1 ring-inset ring-amber-600/20 overflow-hidden">
                     <span className="relative z-10">Educational</span>
@@ -140,8 +146,17 @@ export const EthicalBanner = () => {
                 }}
                 className="group/btn relative -mr-2 -mt-2 p-2 rounded-full hover:bg-slate-100 transition-all active:scale-95"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400 group-hover/btn:text-red-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-slate-400 group-hover/btn:text-red-500 transition-colors"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </button>
             </div>
