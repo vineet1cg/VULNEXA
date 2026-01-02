@@ -76,7 +76,7 @@ export const EthicalBanner = () => {
       >
         <div className="banner-float-layer relative transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:scale-[1.01]">
           {/* 1. GLASS BACKGROUND & BORDER */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/40 bg-white/60 backdrop-blur-xl shadow-lg transition-all duration-500 group-hover:shadow-[0_20px_60px_-15px_rgba(245,158,11,0.3)] group-hover:border-amber-400/50">
+          <div className="relative overflow-hidden rounded-2xl border border-cyber-slate/20 bg-cyber-dark/60 backdrop-blur-xl shadow-lg transition-all duration-500 group-hover:shadow-[0_20px_60px_-15px_rgba(245,158,11,0.3)] group-hover:border-amber-400/50">
             {/* 2. DYNAMIC SPOTLIGHT (Follows Mouse) */}
             <div
               className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -94,7 +94,7 @@ export const EthicalBanner = () => {
               {/* Animated Icon */}
               <div className="relative flex-shrink-0">
                 <div className="absolute inset-0 bg-amber-400 rounded-full blur-md opacity-20 animate-pulse"></div>
-                <div className="relative p-3 bg-gradient-to-br from-white to-amber-50 rounded-xl shadow-md border border-amber-100 text-amber-600 ring-1 ring-amber-500/10 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
+                <div className="relative p-3 bg-gradient-to-br from-cyber-dark to-amber-950/30 rounded-xl shadow-md border border-amber-500/20 text-amber-500 ring-1 ring-amber-500/10 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -113,23 +113,23 @@ export const EthicalBanner = () => {
               {/* Text Content */}
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-base font-bold text-slate-900 tracking-tight group-hover:text-amber-700 transition-colors">
+                  <h3 className="text-base font-bold text-cyber-white tracking-tight group-hover:text-amber-400 transition-colors">
                     {notice.title}
                   </h3>
 
                   {/* Glowing Badge */}
-                  <span className="relative inline-flex h-5 items-center justify-center rounded-full bg-amber-100 px-2.5 text-[10px] font-black uppercase tracking-widest text-amber-700 ring-1 ring-inset ring-amber-600/20 overflow-hidden">
+                  <span className="relative inline-flex h-5 items-center justify-center rounded-full bg-amber-500/10 px-2.5 text-[10px] font-black uppercase tracking-widest text-amber-500 ring-1 ring-inset ring-amber-500/20 overflow-hidden">
                     <span className="relative z-10">Educational</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/40 to-transparent animate-[shimmer_2s_infinite]"></div>
                   </span>
                 </div>
 
-                <p className="text-sm text-slate-600 leading-relaxed font-medium group-hover:text-slate-800 transition-colors">
+                <p className="text-sm text-cyber-slate leading-relaxed font-medium group-hover:text-cyber-white transition-colors">
                   {notice.content}
                 </p>
 
                 {/* Micro-Interaction Note */}
-                <div className="inline-flex items-center gap-2 rounded-lg bg-amber-50/50 px-3 py-1.5 text-xs font-semibold text-amber-800/70 border border-amber-100/50 group-hover:bg-amber-100/50 group-hover:border-amber-200 transition-colors">
+                <div className="inline-flex items-center gap-2 rounded-lg bg-amber-500/5 px-3 py-1.5 text-xs font-semibold text-amber-500/70 border border-amber-500/20 group-hover:bg-amber-500/10 group-hover:border-amber-500/30 transition-colors">
                   <span className="flex h-2 w-2 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
@@ -148,7 +148,7 @@ export const EthicalBanner = () => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-slate-400 group-hover/btn:text-red-500 transition-colors"
+                  className="h-5 w-5 text-cyber-slate group-hover/btn:text-red-500 transition-colors"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >

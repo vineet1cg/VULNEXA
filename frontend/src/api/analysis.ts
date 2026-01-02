@@ -23,7 +23,8 @@ export const analysisApi = {
   // -----------------------------
   getHistory: async (): Promise<AnalysisHistoryItem[]> => {
     const response = await api.get("/api/analyze/history");
-    return response.data;
+    // Backend returns { success: true, analyses: [...] }
+    return response.data.analyses || [];
   },
 
   // -----------------------------
@@ -31,6 +32,7 @@ export const analysisApi = {
   // -----------------------------
   getAnalysisById: async (id: string) => {
     const response = await api.get(`/api/analyze/${id}`);
+    // Backend returns { success: true, analysis: {...} }
     return response.data;
   },
 

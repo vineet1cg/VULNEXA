@@ -6,17 +6,17 @@ interface GlassCardProps {
 }
 
 export const GlassCard = ({ children, className = "" }: GlassCardProps) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
     whileHover={{ y: -5, transition: { duration: 0.2 } }}
-    className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl relative overflow-hidden ${className}`}
+    className={`bg-cyber-dark/40 backdrop-blur-xl border border-cyber-slate/20 rounded-3xl p-6 shadow-glass relative overflow-hidden ${className}`}
   >
     {/* Optional: Subtle gradient overlay for extra sheen */}
     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-    <div className="relative z-10">
-        {children}
+    <div className="relative z-10 h-full w-full">
+      {children}
     </div>
   </motion.div>
 );

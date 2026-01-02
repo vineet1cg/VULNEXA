@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -27,10 +27,6 @@ import {
 const container = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
 };
 
 export const DashboardPage = () => {
@@ -88,15 +84,15 @@ export const DashboardPage = () => {
   };
 
   useEffect(() => {
-  // ⛔ Do not fetch until auth is ready
-  if (!user) return;
+    // ⛔ Do not fetch until auth is ready
+    if (!user) return;
 
-  fetchMetrics();
+    fetchMetrics();
 
-  // Auto-refresh every 30 seconds
-  const poller = setInterval(fetchMetrics, 30000);
-  return () => clearInterval(poller);
-}, [user]);
+    // Auto-refresh every 30 seconds
+    const poller = setInterval(fetchMetrics, 30000);
+    return () => clearInterval(poller);
+  }, [user]);
 
 
   // // 2. SIMULATE HARDWARE STATS
@@ -149,16 +145,16 @@ export const DashboardPage = () => {
     currentRiskScore > 70
       ? "critical"
       : currentRiskScore > 40
-      ? "warning"
-      : "secure";
+        ? "warning"
+        : "secure";
 
-      useEffect(() => {
-  const timeout = setTimeout(() => {
-    setLoading(false);
-  }, 5000);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
 
-  return () => clearTimeout(timeout);
-}, []);
+    return () => clearTimeout(timeout);
+  }, []);
 
   if (loading) {
     return (
@@ -188,7 +184,7 @@ export const DashboardPage = () => {
               COMMAND_CENTER
             </h1>
             <p className="text-gray-500 text-xs font-bold uppercase tracking-[0.3em] mt-1 flex items-center">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse shadow-[0_0_10px_#10b981]" />
+              <span className="w-2 h-2 bg-cyber-green rounded-full mr-2 animate-pulse shadow-[0_0_10px_theme(colors.cyber.green)]" />
               VULNEXA_CORE v4.0.0 // USER:{" "}
               {user?.name?.toUpperCase() || "ADMIN"}
             </p>
@@ -206,7 +202,7 @@ export const DashboardPage = () => {
             </button>
             <button
               onClick={() => navigate("/analyze")}
-              className="px-6 py-3 rounded-xl bg-cyber-blue text-black font-black text-xs uppercase tracking-widest flex items-center shadow-[0_0_20px_rgba(0,242,255,0.3)] hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all transform hover:-translate-y-1"
+              className="px-6 py-3 rounded-xl bg-cyber-blue text-black font-black text-xs uppercase tracking-widest flex items-center shadow-[0_0_20px_theme(colors.cyber.blue)] hover:shadow-[0_0_30px_theme(colors.cyber.blue)] transition-all transform hover:-translate-y-1"
             >
               <Plus size={18} className="mr-2" /> New Security Scan
             </button>
@@ -232,7 +228,7 @@ export const DashboardPage = () => {
               label: "NETWORK_LATENCY",
               value: `${latency}ms`,
               icon: Network,
-              color: "text-purple-500",
+              color: "text-cyber-purple",
             },
             {
               label: "TOTAL_SCANS",
@@ -247,7 +243,7 @@ export const DashboardPage = () => {
               color:
                 safeStats.totalVulnerabilities > 0
                   ? "text-red-500"
-                  : "text-emerald-500",
+                  : "text-cyber-green",
             },
           ].map((stat, i) => (
             <GlassCard
@@ -295,17 +291,17 @@ export const DashboardPage = () => {
                   {
                     label: "HIGH",
                     val: safeStats.severity.High,
-                    color: "bg-orange-500",
+                    color: "bg-cyber-purple",
                   },
                   {
                     label: "MEDIUM",
                     val: safeStats.severity.Medium,
-                    color: "bg-yellow-500",
+                    color: "bg-cyber-blue/60",
                   },
                   {
                     label: "LOW",
                     val: safeStats.severity.Low,
-                    color: "bg-emerald-500",
+                    color: "bg-cyber-green",
                   },
                 ].map((bar, i) => (
                   <div key={i}>
@@ -322,7 +318,7 @@ export const DashboardPage = () => {
                           width: `${Math.min(
                             100,
                             (bar.val / (safeStats.totalVulnerabilities || 1)) *
-                              100
+                            100
                           )}%`,
                         }}
                         transition={{ duration: 1, delay: i * 0.1 }}
@@ -418,7 +414,7 @@ export const DashboardPage = () => {
             </div>
           </div>
           <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer">
-            <div className="p-3 rounded-lg bg-purple-500/10 text-purple-500">
+            <div className="p-3 rounded-lg bg-cyber-purple/10 text-cyber-purple">
               <Download size={20} />
             </div>
             <div>
@@ -429,7 +425,7 @@ export const DashboardPage = () => {
             </div>
           </div>
           <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer">
-            <div className="p-3 rounded-lg bg-emerald-500/10 text-emerald-500">
+            <div className="p-3 rounded-lg bg-cyber-green/10 text-cyber-green">
               <ShieldCheck size={20} />
             </div>
             <div>

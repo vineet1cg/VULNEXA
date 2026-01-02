@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 
 // Professional Status Badge with Glow
@@ -12,7 +11,7 @@ export const StatusBadge = ({ status }: { status: 'secure' | 'warning' | 'critic
 
   // Default to 'info' if status key doesn't match
   const activeStyle = styles[status?.toLowerCase()] || styles.info;
-  
+
   return (
     <div className={`px-3 py-1 rounded-md text-[10px] font-black border uppercase tracking-widest ${activeStyle}`}>
       {status}

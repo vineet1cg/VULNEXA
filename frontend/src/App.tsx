@@ -4,11 +4,11 @@ import { DashboardPage } from "./pages/DashboardPage"; // ✅ FIXED: Added { }
 import { AnalysisPage } from "./pages/AnalysisPage";   // ✅ FIXED: Added { }
 import HistoryPage from "./pages/HistoryPage";         // Kept as default (unless you updated it too)
 import ProtectedRoute from "./components/ProtectedRoute";
-import "./pages/DashboardAnimations.css"; 
+import "./pages/DashboardAnimations.css";
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 bg-noise-subtle antialiased selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-cyber-black font-sans text-cyber-white bg-noise-subtle antialiased selection:bg-cyber-purple selection:text-white overflow-x-hidden">
       <Routes>
         {/* Public Route */}
         <Route path="/login" element={<LoginPage />} />

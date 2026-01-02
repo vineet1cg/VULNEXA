@@ -1,17 +1,16 @@
 import React from 'react';
-import { LayoutDashboard, ShieldCheck, History, Terminal, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, History, Terminal } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const SidebarItem = ({ icon: Icon, label, path, active }: any) => {
   const navigate = useNavigate();
   return (
-    <div 
+    <div
       onClick={() => navigate(path)}
-      className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all duration-300 ${
-      active 
-        ? 'bg-cyber-blue/10 text-cyber-blue border-l-4 border-cyber-blue shadow-neon-blue' 
-        : 'text-gray-400 hover:bg-white/5 hover:text-white'
-    }`}>
+      className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all duration-300 ${active
+          ? 'bg-cyber-blue/10 text-cyber-blue border-l-4 border-cyber-blue shadow-neon-blue'
+          : 'text-gray-400 hover:bg-white/5 hover:text-white'
+        }`}>
       <Icon size={20} />
       <span className="font-medium tracking-wide">{label}</span>
     </div>
@@ -57,12 +56,12 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
       {/* Main Content Area */}
       <main className="flex-1 ml-64 p-8 relative">
-         {/* Background Glow Effect */}
-         <div className="absolute top-0 left-0 w-full h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyber-blue/10 via-cyber-black to-transparent pointer-events-none" />
-         
-         <div className="relative z-10 max-w-7xl mx-auto">
-            {children}
-         </div>
+        {/* Background Glow Effect */}
+        <div className="absolute top-0 left-0 w-full h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyber-blue/10 via-cyber-black to-transparent pointer-events-none" />
+
+        <div className="relative z-10 max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

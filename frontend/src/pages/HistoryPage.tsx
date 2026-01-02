@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { analysisApi } from "../api/analysis";
 import type { AnalysisHistoryItem, AnalysisResult } from "../types/analysis";
-import { EthicalBanner } from "../components/EthicalBanner";
 import { RiskMeter } from "../components/RiskMeter";
 import { VulnerabilityCard } from "../components/VulnerabilityCard";
-import "./DashboardAnimations.css"; // Reuse the animations file
+import { DashboardLayout } from "../components/DashboardLayout";
+import { GlassCard } from "../components/GlassCard";
+import {
+  History,
+  AlertTriangle,
+  Clock,
+  ShieldAlert,
+  CheckCircle2,
+  FileText,
+} from "lucide-react";
+import "./DashboardAnimations.css";
 
 const HistoryPage = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   // -----------------------------
@@ -18,7 +28,7 @@ const HistoryPage = () => {
   const [history, setHistory] = useState<AnalysisHistoryItem[]>([]);
   const [selectedAnalysis, setSelectedAnalysis] =
     useState<AnalysisResult | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null); // Track ID for UI highlighting
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
@@ -31,7 +41,7 @@ const HistoryPage = () => {
     const fetchHistory = async () => {
       try {
         const data = await analysisApi.getHistory();
-        setHistory(Array.isArray(data.analyses) ? data.analyses : []);
+        setHistory(Array.isArray(data) ? data : []);
       } catch (err: any) {
         setError(
           err.response?.data?.message || "Failed to load analysis history"
@@ -48,10 +58,18 @@ const HistoryPage = () => {
   // -----------------------------
   const loadAnalysis = async (id: string) => {
     try {
-      setSelectedId(id); // Set active state immediately for UI feedback
+      setSelectedId(id);
       setLoadingAnalysis(true);
-      const analysis = await analysisApi.getAnalysisById(id);
-      setSelectedAnalysis(analysis);
+      const response = await analysisApi.getAnalysisById(id);
+      // Backend returns { success: true, analysis: {...} }
+      if (response && response.analysis) {
+        setSelectedAnalysis(response.analysis);
+      } else if (response && response.id) {
+        // Fallback if response structure is different
+        setSelectedAnalysis(response as AnalysisResult);
+      } else {
+        setError("Invalid analysis data received");
+      }
     } catch (err) {
       console.error("Failed to load analysis", err);
       setError("Failed to load selected analysis");
@@ -60,71 +78,67 @@ const HistoryPage = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  // Helper to get risk score
+  const getRiskScore = (analysis: AnalysisResult | null) => {
+    if (!analysis) return 0;
+    return analysis.overallRiskScore ?? analysis.riskScore ?? 0;
   };
 
   // -----------------------------
   // Render
   // -----------------------------
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 bg-noise-subtle">
-      {/* 1. Sticky Glass Header */}
-      <header className="sticky top-0 z-50 glass-panel border-b border-white/50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30 status-beacon-pulse">
-              <span className="text-white font-bold text-lg">V</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-                Analysis History
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg shadow-sm hover:bg-slate-50 transition-all btn-magnetic"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => navigate("/analyze")}
-              className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg shadow-md shadow-indigo-200 hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all btn-magnetic"
-            >
-              New Analysis
-            </button>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-slate-500 hover:text-red-600 font-medium transition-colors btn-magnetic"
-            >
-              Sign Out
-            </button>
+    <DashboardLayout>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="space-y-6"
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-black tracking-tighter text-white flex items-center gap-3">
+              <History className="text-cyber-blue" size={32} />
+              ANALYSIS_HISTORY
+            </h1>
+            <p className="text-gray-500 text-xs font-bold uppercase tracking-[0.3em] mt-1 flex items-center">
+              <span className="w-2 h-2 bg-cyber-green rounded-full mr-2 animate-pulse shadow-[0_0_10px_theme(colors.cyber.green)]" />
+              {history.length} Total Scans // USER:{" "}
+              {user?.name?.toUpperCase() || "ADMIN"}
+            </p>
           </div>
         </div>
-        <div className="frosted-divider"></div>
-      </header>
 
-      {/* 2. Main Content - Staggered Entry */}
-      <main className="max-w-7xl mx-auto px-6 py-8 stagger-container">
-        <div className="mb-8 hover:scale-[1.01] transition-transform duration-300">
-          <EthicalBanner />
-        </div>
-
+        {/* Error Banner */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r shadow-sm flex items-center justify-between animate-pulse">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 flex items-center"
+          >
+            <AlertTriangle className="mr-3" size={20} />
             {error}
-          </div>
+          </motion.div>
         )}
 
         {loading ? (
-          // 3. Skeleton Loading State
+          // Loading State
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 h-[500px] rounded-xl skeleton-shimmer"></div>
-            <div className="lg:col-span-2 h-[500px] rounded-xl skeleton-shimmer"></div>
+            <GlassCard className="lg:col-span-1 h-[600px]">
+              <div className="h-8 w-32 bg-white/5 rounded animate-pulse mb-4"></div>
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-24 bg-white/5 rounded-xl animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            </GlassCard>
+            <GlassCard className="lg:col-span-2 h-[600px]">
+              <div className="h-8 w-48 bg-white/5 rounded animate-pulse mb-6"></div>
+              <div className="h-32 w-full bg-white/5 rounded animate-pulse"></div>
+            </GlassCard>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -132,96 +146,118 @@ const HistoryPage = () => {
                 HISTORY LIST (SUMMARY)
                ================================================== */}
             <div className="lg:col-span-1">
-              <div className="glass-panel rounded-xl border border-white/60 p-4 h-[calc(100vh-200px)] overflow-hidden flex flex-col">
-                <h2 className="text-lg font-bold text-slate-800 mb-4 px-2">
-                  Past Analyses{" "}
-                  <span className="text-slate-400 font-normal text-sm ml-1">
-                    ({history.length})
-                  </span>
-                </h2>
-
-                {history.length === 0 ? (
-                  <div className="text-center py-12 text-slate-400">
-                    No analysis history found
+              <GlassCard className="h-[calc(100vh-200px)] border-cyber-blue/20">
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10 shrink-0">
+                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                      <FileText size={20} className="text-cyber-blue" />
+                      Past Analyses
+                    </h2>
+                    <span className="text-xs font-bold text-gray-500 bg-white/5 px-2 py-1 rounded uppercase tracking-wider">
+                      {history.length}
+                    </span>
                   </div>
-                ) : (
-                  <div className="space-y-3 overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-                    {history.map((analysis) => {
-                      const isSelected = selectedId === analysis.id;
-                      return (
-                        <button
-                          key={analysis.id}
-                          onClick={() => loadAnalysis(analysis.id)}
-                          className={`
-                            w-full text-left p-4 rounded-xl border transition-all duration-300 group relative overflow-hidden
-                            ${
-                              isSelected
-                                ? "bg-indigo-50 border-indigo-200 shadow-md ring-1 ring-indigo-400 scale-[1.02]"
-                                : "bg-white/50 border-slate-100 hover:bg-white hover:border-slate-300 hover:shadow-lg hover:-translate-y-1"
-                            }
-                          `}
-                        >
-                          {/* Accent Border Reveal (Vertical on Left for active) */}
-                          {isSelected && (
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500"></div>
-                          )}
 
-                          <div className="flex justify-between items-start mb-2">
-                            <span
-                              className={`text-xs font-bold px-2 py-1 rounded uppercase tracking-wider ${
-                                isSelected
-                                  ? "bg-indigo-200 text-indigo-800"
-                                  : "bg-slate-200 text-slate-600"
-                              }`}
-                            >
-                              {analysis.inputType}
-                            </span>
-                            <span className="text-xs text-slate-400 font-mono">
-                              {new Date(
-                                analysis.analysisDate
-                              ).toLocaleDateString()}
-                            </span>
-                          </div>
+                  {history.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                      <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+                        <History className="text-gray-600" size={32} />
+                      </div>
+                      <p className="text-gray-500 text-sm font-medium">
+                        No analysis history found
+                      </p>
+                      <button
+                        onClick={() => navigate("/analyze")}
+                        className="mt-4 px-4 py-2 bg-cyber-blue text-black font-black text-xs uppercase tracking-widest rounded-lg hover:bg-cyber-blue/80 transition-all"
+                      >
+                        Start First Analysis
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex-1 space-y-3 overflow-y-scroll pb-4 custom-scrollbar" style={{ paddingRight: '4px', minHeight: 0 }}>
+                      <AnimatePresence>
+                        {history.map((analysis) => {
+                          const isSelected = selectedId === analysis.id;
+                          const riskScore = analysis.overallRiskScore;
+                          const riskColor =
+                            riskScore > 70
+                              ? "text-red-500"
+                              : riskScore > 40
+                                ? "text-cyber-purple"
+                                : "text-cyber-green";
 
-                          <div className="flex items-center justify-between">
-                            <div className="text-sm font-semibold text-slate-700">
-                              Risk Score
-                            </div>
-                            <div
-                              className={`text-xl font-bold ${
-                                analysis.overallRiskScore > 70
-                                  ? "text-red-500"
-                                  : analysis.overallRiskScore > 40
-                                  ? "text-amber-500"
-                                  : "text-emerald-500"
-                              }`}
+                          return (
+                            <motion.button
+                              key={analysis.id}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -20 }}
+                              onClick={() => loadAnalysis(analysis.id)}
+                              className={`
+                              w-full text-left p-4 rounded-xl border transition-all duration-300 group relative overflow-hidden
+                              ${isSelected
+                                  ? "bg-cyber-blue/20 border-cyber-blue/50 shadow-lg shadow-cyber-blue/20 scale-[1.02]"
+                                  : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-cyber-blue/30 hover:shadow-md hover:-translate-y-1"
+                                }
+                            `}
                             >
-                              {analysis.overallRiskScore}
-                            </div>
-                          </div>
+                              {/* Accent Border Reveal */}
+                              {isSelected && (
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyber-blue"></div>
+                              )}
 
-                          <div className="mt-2 text-xs text-slate-500 flex items-center gap-1">
-                            <svg
-                              className="w-3 h-3"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                              />
-                            </svg>
-                            {analysis.vulnerabilityCount} Vulnerabilities
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                              <div className="flex justify-between items-start mb-3">
+                                <span
+                                  className={`text-[10px] font-black px-2 py-1 rounded uppercase tracking-wider ${isSelected
+                                    ? "bg-cyber-blue/30 text-cyber-blue border border-cyber-blue/50"
+                                    : "bg-white/10 text-gray-400 border border-white/10"
+                                    }`}
+                                >
+                                  {analysis.inputType}
+                                </span>
+                                <div className="flex items-center gap-1 text-[10px] text-gray-500">
+                                  <Clock size={12} />
+                                  <span className="font-mono">
+                                    {new Date(
+                                      analysis.analysisDate
+                                    ).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                  Risk Score
+                                </div>
+                                <div
+                                  className={`text-2xl font-black ${riskColor} drop-shadow-sm`}
+                                >
+                                  {riskScore}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                                <ShieldAlert
+                                  size={14}
+                                  className={
+                                    analysis.vulnerabilityCount > 0
+                                      ? "text-red-500"
+                                      : "text-cyber-green"
+                                  }
+                                />
+                                <span className="font-mono">
+                                  {analysis.vulnerabilityCount} Vuln
+                                  {analysis.vulnerabilityCount !== 1 ? "s" : ""}
+                                </span>
+                              </div>
+                            </motion.button>
+                          );
+                        })}
+                      </AnimatePresence>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
             </div>
 
             {/* ==================================================
@@ -229,27 +265,31 @@ const HistoryPage = () => {
                ================================================== */}
             <div className="lg:col-span-2">
               {loadingAnalysis ? (
-                <div className="glass-panel p-8 rounded-xl h-full flex flex-col gap-6">
-                  <div className="h-8 w-1/3 rounded bg-slate-200 animate-pulse"></div>
-                  <div className="h-32 w-full rounded bg-slate-100 skeleton-shimmer"></div>
+                <GlassCard className="h-[calc(100vh-200px)] flex flex-col gap-6">
+                  <div className="h-8 w-1/3 rounded bg-white/5 animate-pulse"></div>
+                  <div className="h-32 w-full rounded bg-white/5 animate-pulse"></div>
                   <div className="space-y-4">
-                    <div className="h-20 w-full rounded bg-slate-100 skeleton-shimmer"></div>
-                    <div className="h-20 w-full rounded bg-slate-100 skeleton-shimmer"></div>
+                    <div className="h-20 w-full rounded bg-white/5 animate-pulse"></div>
+                    <div className="h-20 w-full rounded bg-white/5 animate-pulse"></div>
                   </div>
-                </div>
+                </GlassCard>
               ) : selectedAnalysis ? (
-                // 4. Detail Panel Entry Animation
-                <div className="glass-panel rounded-xl border border-white/60 p-6 animate-[fadeInUp_0.4s_ease-out] shadow-xl shadow-slate-200/50">
-                  <div className="mb-8 border-b border-slate-100 pb-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  {/* Report Header */}
+                  <GlassCard className="border-cyber-blue/20">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
                       <div>
-                        <h2 className="text-2xl font-bold text-slate-800">
-                          Analysis Report
+                        <h2 className="text-2xl font-black text-white tracking-tighter mb-2">
+                          ANALYSIS_REPORT
                         </h2>
                         {selectedAnalysis.createdAt && (
-                          <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-indigo-500 status-beacon-pulse"></span>
-                            Generated on{" "}
+                          <p className="text-xs text-gray-500 font-mono flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-cyber-blue animate-pulse"></span>
+                            Generated:{" "}
                             {new Date(
                               selectedAnalysis.createdAt
                             ).toLocaleString()}
@@ -257,107 +297,121 @@ const HistoryPage = () => {
                         )}
                       </div>
 
-                      <div className="bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
-                        <p className="text-xs text-slate-500 uppercase tracking-wide text-center">
+                      <div className="bg-white/5 px-4 py-3 rounded-lg border border-white/10">
+                        <p className="text-[10px] text-gray-500 uppercase tracking-wider text-center mb-2">
                           Risk Level
                         </p>
                         <RiskMeter
-                          riskScore={
-                            selectedAnalysis.overallRiskScore ??
-                            selectedAnalysis.riskScore
-                          }
+                          riskScore={getRiskScore(selectedAnalysis)}
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                      <svg
-                        className="w-5 h-5 text-rose-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                        />
-                      </svg>
-                      Detected Vulnerabilities
-                      <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">
-                        {selectedAnalysis.vulnerabilities.length}
-                      </span>
-                    </h3>
-
-                    {selectedAnalysis.vulnerabilities.length === 0 ? (
-                      <div className="p-6 bg-green-50 border border-green-200 rounded-xl text-green-800 flex items-center gap-3">
-                        <div className="bg-green-100 p-2 rounded-full">
-                          <svg
-                            className="w-6 h-6 text-green-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="font-semibold">System Secure</p>
-                          <p className="text-sm opacity-80">
-                            No vulnerabilities were detected in this scan.
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {/* 5. Vulnerability Cards with Hover Lift */}
-                        {selectedAnalysis.vulnerabilities.map((vuln, index) => (
-                          <div
-                            key={index}
-                            className="card-hover-effect bg-white rounded-lg border border-slate-100 shadow-sm transition-all duration-300"
-                          >
-                            <VulnerabilityCard vulnerability={vuln} />
+                    <div>
+                      {selectedAnalysis.content && (
+                        <div className="mb-6 pb-6 border-b border-white/10">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                              <FileText size={20} className="text-cyber-blue" />
+                              ANALYZED_SOURCE
+                            </h3>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedAnalysis.content || "");
+                                // Optional: Add toast notification here
+                              }}
+                              className="text-[10px] font-bold uppercase tracking-wider text-gray-500 hover:text-white transition-colors flex items-center gap-1"
+                            >
+                              <FileText size={12} />
+                              Copy Code
+                            </button>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                          <div className="bg-black/40 rounded-xl border border-white/10 p-4 max-h-[300px] overflow-y-auto custom-scrollbar font-mono text-xs text-gray-300">
+                            <pre className="whitespace-pre-wrap break-all">
+                              {selectedAnalysis.content}
+                            </pre>
+                          </div>
+                        </div>
+                      )}
+
+                      <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <ShieldAlert
+                          size={20}
+                          className={
+                            selectedAnalysis.vulnerabilities.length > 0
+                              ? "text-red-500"
+                              : "text-cyber-green"
+                          }
+                        />
+                        Detected Vulnerabilities
+                        <span className="bg-white/10 text-gray-300 text-xs px-2 py-0.5 rounded-full border border-white/10">
+                          {selectedAnalysis.vulnerabilities.length}
+                        </span>
+                      </h3>
+
+                      {selectedAnalysis.vulnerabilities.length === 0 ? (
+                        <div className="p-6 bg-cyber-green/10 border border-cyber-green/30 rounded-xl flex items-center gap-4">
+                          <div className="p-3 bg-cyber-green/20 rounded-full">
+                            <CheckCircle2
+                              size={24}
+                              className="text-cyber-green"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-bold text-cyber-green">
+                              System Secure
+                            </p>
+                            <p className="text-sm text-gray-400 mt-1">
+                              No vulnerabilities were detected in this scan.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <AnimatePresence>
+                            {selectedAnalysis.vulnerabilities.map(
+                              (vuln, index) => (
+                                <motion.div
+                                  key={index}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ delay: index * 0.1 }}
+                                >
+                                  <VulnerabilityCard vulnerability={vuln} />
+                                </motion.div>
+                              )
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+                    </div>
+                  </GlassCard>
+                </motion.div>
               ) : (
-                <div className="glass-panel rounded-xl border border-white/60 p-12 text-center h-full flex flex-col items-center justify-center text-slate-400">
-                  <div className="bg-slate-50 p-4 rounded-full mb-4">
-                    <svg
-                      className="w-10 h-10 text-slate-300"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                      />
-                    </svg>
+                <GlassCard className="h-[calc(100vh-200px)] flex flex-col items-center justify-center text-center">
+                  <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+                    <FileText size={40} className="text-gray-600" />
                   </div>
-                  <p className="font-medium">
+                  <p className="text-gray-400 font-medium mb-2">
+                    No Analysis Selected
+                  </p>
+                  <p className="text-xs text-gray-600 mb-6">
                     Select an analysis from the list to view details
                   </p>
-                </div>
+                  <button
+                    onClick={() => navigate("/analyze")}
+                    className="px-6 py-3 bg-cyber-blue text-black font-black text-xs uppercase tracking-widest rounded-lg hover:bg-cyber-blue/80 transition-all shadow-[0_0_20px_rgba(0,242,255,0.3)]"
+                  >
+                    Start New Analysis
+                  </button>
+                </GlassCard>
               )}
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </motion.div>
+    </DashboardLayout>
   );
 };
 

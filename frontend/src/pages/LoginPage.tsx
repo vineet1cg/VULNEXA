@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
@@ -30,7 +30,7 @@ export const LoginPage = () => {
             <div className="relative w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md">
               <ShieldCheck size={32} className="text-cyber-blue" />
             </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-cyber-green rounded-full border-2 border-black animate-pulse" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-cyber-green rounded-full border-2 border-cyber-black animate-pulse" />
           </div>
 
           <h1 className="text-3xl font-black tracking-tighter text-white">VULNEXA<span className="text-cyber-blue">_CORE</span></h1>
@@ -75,7 +75,7 @@ export const LoginPage = () => {
               />
             </div>
             {/* DEV LOGIN BYPASS */}
-            {/* <div className="flex justify-center pt-4 border-t border-white/5 mt-4">
+            <div className="flex justify-center pt-4 border-t border-white/5 mt-4">
               <button
                 onClick={async () => {
                   try {
@@ -85,11 +85,11 @@ export const LoginPage = () => {
                     setError("Dev Login failed");
                   }
                 }}
-                className="text-[10px] text-gray-600 hover:text-cyber-blue underline font-mono uppercase tracking-widest transition-colors"
+                className="text-xs font-bold text-cyber-green hover:text-white underline font-mono uppercase tracking-[0.2em] transition-colors animate-pulse"
               >
                 [ BYPASS_AUTH_PROTOCOL ]
               </button>
-            </div> */}
+            </div>
           </div>
 
           <div className="flex justify-between items-center text-[10px] text-gray-600 font-mono uppercase">
