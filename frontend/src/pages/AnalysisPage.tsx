@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, animate } from "framer-motion";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { GlassCard } from "../components/GlassCard";
 import {
@@ -46,13 +46,21 @@ export const AnalysisPage = () => {
   const terminalEndRef = useRef<null | HTMLDivElement>(null);
 
   // --- ACTIONS ---
-  const startScan = async () => {
+  const startScan = async (scanMode: "manual" | "ai" = "manual") => {
     if (status === "SCANNING" || !code.trim()) return;
 
     setStatus("SCANNING");
     setError(null);
     setResult(null);
-    setLogs(["> INITIALIZING SECURE CONNECTION...", "> PACKAGING PAYLOAD..."]);
+    setLogs(
+      scanMode === "ai"
+        ? [
+            "> INITIALIZING SECURE CONNECTION...",
+            "> AI HEURISTICS ENABLED...",
+            "> PACKAGING PAYLOAD...",
+          ]
+        : ["> INITIALIZING SECURE CONNECTION...", "> PACKAGING PAYLOAD..."]
+    );
 
     try {
       // 1. Minimum "Scanning" Duration for UX (2.5 seconds)
@@ -64,24 +72,20 @@ export const AnalysisPage = () => {
         "> TRANSMITTING TO ENGINE...",
         "> ENCRYPTING PACKETS...",
       ]);
-      setTimeout(
-        () =>
-          setLogs((prev) => [
-            ...prev,
-            "> HANDSHAKE ESTABLISHED",
-            "> SCANNING VECTORS...",
-          ]),
-        800
-      );
-      setTimeout(
-        () =>
-          setLogs((prev) => [
-            ...prev,
-            "> HEURISTICS ENGINE: ACTIVE",
-            "> DEEP PACKET INSPECTION...",
-          ]),
-        1600
-      );
+      setTimeout(() => {
+        setLogs((prev) => [
+          ...prev,
+          "> HANDSHAKE ESTABLISHED",
+          scanMode === "ai" ? "> AI MODEL PRIMED..." : "> SCANNING VECTORS...",
+        ]);
+      }, 800);
+      setTimeout(() => {
+        setLogs((prev) => [
+          ...prev,
+          scanMode === "ai" ? "> AI ANALYSIS: ACTIVE" : "> HEURISTICS ENGINE: ACTIVE",
+          "> DEEP PACKET INSPECTION...",
+        ]);
+      }, 1600);
 
       // 2. Real API Call (Parallel)
       const dataPromise = analysisApi.analyze({
@@ -89,7 +93,7 @@ export const AnalysisPage = () => {
         content: code,
       });
 
-      const [_, data] = await Promise.all([minDurationPromise, dataPromise]);
+      const [, data] = await Promise.all([minDurationPromise, dataPromise]);
 
       if (!data) {
         throw new Error("Received empty response from server");
@@ -109,11 +113,12 @@ export const AnalysisPage = () => {
         "> DECRYPTING RESULTS...",
       ]);
       setStatus("FINISHED");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Analysis Error:", err);
       // Safely extract error message
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Connection failed";
+      type ErrShape = { message?: string; response?: { data?: { message?: string } } };
+      const e = err as ErrShape;
+      const errMsg = e.response?.data?.message ?? e.message ?? "Connection failed";
 
       setError(`Analysis Terminated: ${errMsg}`);
       setLogs((prev) => [...prev, `> ERROR: ${errMsg}`, "> ABORTING..."]);
@@ -149,6 +154,56 @@ export const AnalysisPage = () => {
     }
   };
 
+  // --- SCRAMBLE TEXT EFFECT ---
+  const ScrambleText = ({ text, className }: { text: string, className?: string }) => {
+    const [display, setDisplay] = useState(text);
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+    useEffect(() => {
+      let iteration = 0;
+      const interval = setInterval(() => {
+        setDisplay(
+          text
+            .split("")
+            .map((_, index) => {
+              if (index < iteration) return text[index];
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join("")
+        );
+
+        if (iteration >= text.length) clearInterval(interval);
+        iteration += 1 / 3;
+      }, 30);
+
+      return () => clearInterval(interval);
+    }, [text]);
+
+    return <span className={className}>{display}</span>;
+  };
+
+  // --- ANIMATED COUNTER ---
+  const AnimatedCounter = ({ value }: { value: number }) => {
+    const nodeRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+      const node = nodeRef.current;
+      if (!node) return;
+
+      const controls = animate(0, value, {
+        duration: 1.5,
+        ease: "easeOut",
+        onUpdate(v) {
+          node.textContent = v.toFixed(1);
+        },
+      });
+
+      return () => controls.stop();
+    }, [value]);
+
+    return <span ref={nodeRef} />;
+  };
+
   return (
     <DashboardLayout>
       {/* 1. TOP HEADER WITH GLITCH EFFECT */}
@@ -156,7 +211,7 @@ export const AnalysisPage = () => {
         <div className="relative group">
           <motion.h1
             animate={
-              isDanger
+              status === "SCANNING" && isDanger
                 ? {
                   x: [-1, 1, -1, 0],
                   filter: [
@@ -167,7 +222,7 @@ export const AnalysisPage = () => {
                 }
                 : {}
             }
-            transition={{ repeat: Infinity, duration: 0.2 }}
+            transition={status === "SCANNING" ? { repeat: Infinity, duration: 0.2 } : undefined}
             className="text-3xl font-black tracking-tighter italic select-none text-white"
           >
             VULN-LAB <span className="text-cyber-blue">X-01</span>
@@ -215,27 +270,42 @@ export const AnalysisPage = () => {
             className={`relative overflow-hidden transition-all duration-500 ${isDanger ? "border-red-500/50" : "border-cyber-blue/20"
               }`}
           >
-            {/* LASER SCANNING ANIMATION */}
+            {/* ADVANCED SCANNING ANIMATION */}
             <AnimatePresence>
               {status === "SCANNING" && (
-                <motion.div
-                  initial={{ top: "0%", opacity: 0 }}
-                  animate={{ top: "100%", opacity: 0.3 }}
-                  exit={{ opacity: 0 }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="absolute left-0 right-0 h-[1px] bg-cyber-blue z-10 pointer-events-none"
-                />
+                <>
+                  {/* 2. Grid Pulse */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: [0, 0.5, 0], scale: 1.1 }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 z-0 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"
+                    style={{
+                      backgroundImage: `linear-gradient(${isDanger ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)'} 1px, transparent 1px), linear-gradient(90deg, ${isDanger ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)'} 1px, transparent 1px)`,
+                      backgroundSize: '40px 40px'
+                    }}
+                  />
+
+                  {/* 3. Scanning Bar */}
+                  <motion.div
+                    initial={{ top: "-10%", opacity: 0 }}
+                    animate={{ top: "110%", opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className={`absolute left-0 right-0 h-32 bg-gradient-to-b from-transparent ${isDanger ? 'via-red-500/20' : 'via-cyber-blue/20'} to-transparent z-10 pointer-events-none backdrop-blur-[2px]`}
+                  />
+                </>
               )}
             </AnimatePresence>
 
-            <div className="flex justify-between items-center mb-4 text-[10px] font-bold text-gray-500 tracking-widest uppercase">
+            <div className="flex justify-between items-center mb-4 text-[10px] font-bold text-gray-500 tracking-widest uppercase relative z-20">
               <div className="flex items-center space-x-2">
-                <Code2 size={14} className="mr-2 text-cyber-blue" />{" "}
-                <span>Analysis_Buffer</span>
+                <Code2 size={14} className={`mr-2 ${status === "SCANNING" ? "animate-spin" : ""} text-cyber-blue`} />{" "}
+                <ScrambleText text="Analysis_Buffer" />
               </div>
               <div className="flex items-center space-x-2">
                 <span
@@ -266,30 +336,47 @@ export const AnalysisPage = () => {
               <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
             </div>
 
-            {/* INITIALIZE BUTTON */}
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={startScan}
-              disabled={status === "SCANNING" || !code}
-              className={`w-full mt-4 py-4 rounded-xl font-black uppercase tracking-[0.3em] flex items-center justify-center space-x-3 transition-all relative overflow-hidden group ${status === "SCANNING"
-                ? "bg-gray-800 text-gray-500"
-                : isDanger
-                  ? "bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.4)] text-white"
-                  : "bg-gradient-to-r from-cyber-blue to-cyber-purple text-cyber-black shadow-[0_0_30px_rgb(var(--cyber-blue))] cyber-btn"
-                } ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
-            >
-              {status === "SCANNING" ? (
-                <RefreshCw className="animate-spin" size={20} />
-              ) : (
-                <Play fill="currentColor" size={20} />
-              )}
-              <span className="relative z-10">
-                {status === "SCANNING"
-                  ? "Processing..."
-                  : "Initialize Analysis"}
-              </span>
-            </motion.button>
+            {/* INITIALIZE BUTTONS */}
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => startScan("manual")}
+                disabled={status === "SCANNING" || !code}
+                className={`w-full py-4 rounded-xl font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-3 transition-all relative overflow-hidden group ${status === "SCANNING"
+                  ? "bg-gray-800 text-gray-500"
+                  : isDanger
+                    ? "bg-red-600 text-white shadow-lg shadow-red-900/20"
+                    : "bg-gradient-to-r from-cyber-blue to-cyber-purple text-white shadow-lg shadow-blue-900/20 cyber-btn"
+                  } ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {status === "SCANNING" ? (
+                  <RefreshCw className="animate-spin" size={20} />
+                ) : (
+                  <Play fill="currentColor" size={20} />
+                )}
+                <span className="relative z-10">Manual Analysis</span>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => startScan("ai")}
+                disabled={status === "SCANNING" || !code}
+                className={`w-full py-4 rounded-xl font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-3 transition-all relative overflow-hidden group ${status === "SCANNING"
+                  ? "bg-gray-800 text-gray-500"
+                  : isDanger
+                    ? "bg-red-600 text-white shadow-lg shadow-red-900/20"
+                    : "bg-gradient-to-r from-cyber-purple to-cyber-blue text-white shadow-lg shadow-purple-900/20 cyber-btn"
+                  } ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {status === "SCANNING" ? (
+                  <RefreshCw className="animate-spin" size={20} />
+                ) : (
+                  <Wand2 size={20} />
+                )}
+                <span className="relative z-10">AI Analysis</span>
+              </motion.button>
+            </div>
           </GlassCard>
 
           {/* 3. TERMINAL LOGS */}
@@ -297,7 +384,7 @@ export const AnalysisPage = () => {
             <div className="absolute top-2 right-2 text-[10px] text-gray-600 font-bold uppercase tracking-widest flex items-center">
               <Terminal size={10} className="mr-1" /> SYSTEM_LOGS
             </div>
-            <div className="font-mono text-[10px] text-cyber-green/80 space-y-1 overflow-y-auto h-full pr-2 scrollbar-none">
+            <div className="font-mono text-[10px] text-cyber-green/80 space-y-1 overflow-y-auto h-full pr-2 scrollbar-none stagger-entry">
               {logs.map((log, i) => (
                 <motion.div
                   initial={{ opacity: 0, x: -5 }}
@@ -319,25 +406,25 @@ export const AnalysisPage = () => {
         {/* 4. DIAGNOSTICS & THREAT FEED */}
         <div className="col-span-12 lg:col-span-5 space-y-6">
           <GlassCard className="relative min-h-[540px]">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-8 flex items-center">
-              <Search size={14} className="mr-2 text-cyber-blue" />{" "}
-              Diagnostics_Core
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-8 flex items-center group">
+              <Search size={14} className="mr-2 text-cyber-blue group-hover:animate-spin" />{" "}
+              <span className="group-hover:text-gradient-animate transition-all duration-300">Diagnostics_Core</span>
             </h3>
 
             {/* THREAT LEVEL METER */}
             <div className="mb-10">
               <div className="flex justify-between items-end mb-2">
                 <span className="text-[10px] font-bold text-gray-600">
-                  RISK_SCORE
+                  <ScrambleText text="RISK_SCORE" />
                 </span>
                 <motion.span
                   key={isDanger ? "crit" : "sec"}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ opacity: 0, scale: 0.5, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                   className={`text-2xl font-black italic tracking-tighter ${isDanger ? "text-red-500" : "text-cyber-green"
                     }`}
                 >
-                  {getRiskScore(result).toFixed(1)}
+                  <AnimatedCounter value={getRiskScore(result)} />
                 </motion.span>
               </div>
               <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
@@ -388,22 +475,23 @@ export const AnalysisPage = () => {
                     <div className="flex items-center text-red-500 space-x-2 mb-4">
                       <ShieldAlert size={16} />
                       <span className="text-[10px] font-black uppercase">
-                        Vulnerabilities Detected (
-                        {result.vulnerabilities?.length ?? 0})
+                        <ScrambleText text={`Vulnerabilities Detected (${result.vulnerabilities?.length ?? 0})`} />
                       </span>
                     </div>
 
                     <div className="space-y-2 max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10">
                       {result.vulnerabilities?.map((vuln, i) => (
                         <motion.div
+                          layout
                           key={i}
-                          initial={{ opacity: 0, x: 20 }}
+                          initial={{ opacity: 0, x: -20 }}
                           animate={{
                             opacity: 1,
                             x: 0,
-                            transition: { delay: i * 0.1 },
+                            transition: { delay: i * 0.05, type: "spring", stiffness: 100 },
                           }}
-                          className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5 group hover:border-red-500/30 transition-colors"
+                          whileHover={{ scale: 1.02, x: 5, backgroundColor: "rgba(255,255,255,0.03)" }}
+                          className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-white/5 group hover:border-red-500/30 transition-colors cursor-default"
                         >
                           <div className="flex flex-col">
                             <span className="text-[11px] font-bold text-gray-300">
@@ -433,11 +521,7 @@ export const AnalysisPage = () => {
                       whileTap={{ scale: 0.98 }}
                       className="w-full mt-6 py-3 bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded-lg shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:bg-red-500 transition-all flex items-center justify-center space-x-2"
                     >
-                      {false ? (
-                        <RefreshCw className="animate-spin" size={14} />
-                      ) : (
-                        <Wand2 size={14} />
-                      )}
+                      <Wand2 size={14} />
                       <span>Generate Report</span>
                     </motion.button>
                   </div>

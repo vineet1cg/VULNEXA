@@ -10,15 +10,18 @@ html {
 }
 
 :root {
-  --cyber-black: 2 4 10;
-  --cyber-dark: 13 17 23;
-  --cyber-blue: 255 45 117;
-  /* Swapped Blue for Pink as requested */
-  --cyber-purple: 155 109 255;
-  --cyber-green: 35 134 54;
-  --cyber-slate: 125 133 144;
-  --cyber-white: 230 237 243;
-  --glow-opacity: 0.08;
+  /* Modern SaaS Palette (Finfoco/Boltshift Style) */
+  --cyber-black: 5 5 10;      /* Rich Black - Deepest Background */
+  --cyber-dark: 19 21 31;     /* Dark Grey/Violet - Cards & Panels */
+  
+  --cyber-blue: 217 70 239;   /* Fuchsia 500 - Primary Brand Color (Pink/Magenta) */
+  --cyber-purple: 139 92 246; /* Violet 500 - Secondary Accent */
+  --cyber-green: 16 185 129;  /* Emerald 500 - Success Status */
+  
+  --cyber-slate: 148 163 184; /* Slate 400 - Muted Text */
+  --cyber-white: 248 250 252; /* Slate 50 - High Contrast Text */
+  
+  --glow-opacity: 0.06;       /* Soft ambient glows */
 }
 
 
@@ -41,13 +44,13 @@ body {
   position: absolute;
   width: 8px;
   height: 8px;
-  border: 1px solid rgba(255, 45, 117, 0.2);
+  border: 1px solid rgb(var(--cyber-blue) / 0.3);
   pointer-events: none;
   transition: border-color 0.3s ease;
 }
 
 .group:hover .hud-corner {
-  border-color: rgba(255, 45, 117, 0.5);
+  border-color: rgb(var(--cyber-blue) / 0.8);
 }
 
 .hud-tl {
