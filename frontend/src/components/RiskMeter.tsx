@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface RiskMeterProps {
   riskScore: number; // 0-100
@@ -20,31 +20,31 @@ export const RiskMeter = ({ riskScore }: RiskMeterProps) => {
   const getTheme = (score: number) => {
     if (score < 25) return {
       gradient: 'from-emerald-400 via-emerald-500 to-teal-500',
-      text: 'text-emerald-700',
+      text: 'text-emerald-400',
       bg: 'bg-emerald-500',
       shadow: 'shadow-emerald-500/40',
-      border: 'border-emerald-200'
+      border: 'border-emerald-500/30'
     };
     if (score < 50) return {
       gradient: 'from-amber-400 via-amber-500 to-orange-500',
-      text: 'text-amber-700',
+      text: 'text-amber-400',
       bg: 'bg-amber-500',
       shadow: 'shadow-amber-500/40',
-      border: 'border-amber-200'
+      border: 'border-amber-500/30'
     };
     if (score < 75) return {
       gradient: 'from-orange-500 via-orange-600 to-red-500',
-      text: 'text-orange-700',
+      text: 'text-orange-400',
       bg: 'bg-orange-500',
       shadow: 'shadow-orange-500/40',
-      border: 'border-orange-200'
+      border: 'border-orange-500/30'
     };
     return {
       gradient: 'from-rose-500 via-red-600 to-red-700',
-      text: 'text-rose-700',
+      text: 'text-rose-400',
       bg: 'bg-rose-600',
       shadow: 'shadow-rose-500/40',
-      border: 'border-rose-200'
+      border: 'border-rose-500/30'
     };
   };
 
@@ -80,9 +80,9 @@ export const RiskMeter = ({ riskScore }: RiskMeterProps) => {
       <div
         className={`
           relative w-full group p-5 rounded-2xl border transition-all duration-500 ease-out
-          bg-white/60 backdrop-blur-xl
+          bg-cyber-dark/60 backdrop-blur-xl
           ${isHovered ? 'shadow-2xl scale-[1.02] -translate-y-1' : 'shadow-sm scale-100'}
-          ${isHovered ? theme.border : 'border-slate-200'}
+          ${isHovered ? theme.border : 'border-cyber-slate/20'}
         `}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -94,7 +94,7 @@ export const RiskMeter = ({ riskScore }: RiskMeterProps) => {
         <div className="relative flex items-end justify-between mb-4 z-10">
           <div className="flex flex-col">
             {/* Focus Glow Label */}
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest transition-colors group-hover:text-slate-600 mb-1">
+            <span className="text-[10px] font-bold text-cyber-slate uppercase tracking-widest transition-colors group-hover:text-cyber-white mb-1">
               Threat Analysis
             </span>
 
@@ -117,13 +117,13 @@ export const RiskMeter = ({ riskScore }: RiskMeterProps) => {
               <span className={`text-4xl font-black tracking-tight transition-all duration-700 ${theme.text} drop-shadow-sm`}>
                 {riskScore}
               </span>
-              <span className="text-sm text-slate-400 font-medium">/100</span>
+              <span className="text-sm text-cyber-slate font-medium">/100</span>
             </div>
           </div>
         </div>
 
         {/* Progress Bar Container: Subtle Noise Texture via Grid */}
-        <div className="relative w-full h-5 bg-slate-100/80 rounded-full overflow-hidden shadow-inner ring-1 ring-black/5">
+        <div className="relative w-full h-5 bg-cyber-dark/80 rounded-full overflow-hidden shadow-inner ring-1 ring-black/5">
 
           {/* Background Grid Pattern (Subtle Noise/Tech texture) */}
           <div className="absolute inset-0 w-full h-full opacity-20"
@@ -158,8 +158,8 @@ export const RiskMeter = ({ riskScore }: RiskMeterProps) => {
         </div>
 
         {/* Footer: Fade-In Tooltips / Metadata */}
-        <div className="flex justify-between items-center mt-3 text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-          <span className="group-hover:text-slate-600 transition-colors">Safety Index</span>
+        <div className="flex justify-between items-center mt-3 text-[10px] font-medium text-cyber-slate uppercase tracking-wider">
+          <span className="group-hover:text-cyber-white transition-colors">Safety Index</span>
           <span className={`${theme.text} opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-1 group-hover:translate-y-0`}>
             Real-time
           </span>

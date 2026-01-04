@@ -1,24 +1,24 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 
 // Professional Status Badge with Glow
 export const StatusBadge = ({ status }: { status: 'secure' | 'warning' | 'critical' | 'info' | string }) => {
   const styles: Record<string, string> = {
-    secure: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]',
-    warning: 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]',
-    critical: 'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.2)]',
-    info: 'bg-blue-500/10 text-blue-500 border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.2)]',
+    secure: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.1)]',
+    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.1)]',
+    critical: 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.1)]',
+    info: 'bg-cyber-blue/10 text-cyber-blue border-cyber-blue/20 shadow-[0_0_12px_rgb(var(--cyber-blue)/0.1)]',
   };
 
   // Default to 'info' if status key doesn't match
   const activeStyle = styles[status?.toLowerCase()] || styles.info;
-  
+
   return (
-    <div className={`px-3 py-1 rounded-md text-[10px] font-black border uppercase tracking-widest ${activeStyle}`}>
+    <div className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${activeStyle} animate-[flicker_4s_infinite]`}>
       {status}
     </div>
   );
 };
+
 
 // Animated Loading Dots for Buttons
 export const ButtonLoader = () => (

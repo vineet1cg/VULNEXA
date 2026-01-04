@@ -1,4 +1,3 @@
-import React from "react";
 // Ensure this import path matches your project structure
 // If 'Severity' isn't defined in types, you can remove the import and use string type below
 import type { Severity } from "../types/analysis";
@@ -15,8 +14,8 @@ export const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
       case "LOW":
         return {
           container:
-            "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 shadow-emerald-500/10",
-          dot: "bg-emerald-500",
+            "bg-cyber-green/10 border-cyber-green/20 text-cyber-green shadow-cyber-green/10",
+          dot: "bg-cyber-green",
           ring: "group-hover:ring-emerald-500/30",
           shimmer: "via-emerald-400/20",
         };
@@ -47,8 +46,8 @@ export const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
       default:
         return {
           container:
-            "bg-slate-500/10 border-slate-500/20 text-slate-700 shadow-slate-500/10",
-          dot: "bg-slate-500",
+            "bg-cyber-slate/10 border-cyber-slate/20 text-cyber-slate shadow-cyber-slate/10",
+          dot: "bg-cyber-slate",
           ring: "group-hover:ring-slate-500/30",
           shimmer: "via-slate-400/20",
         };

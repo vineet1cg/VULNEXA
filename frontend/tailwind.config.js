@@ -4,23 +4,34 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], // We will add this font in the next step
+        sans: ['Inter', 'sans-serif'],
       },
       colors: {
         cyber: {
-          black: "#05080a",   // Ultra dark blue-black
-          dark: "#0a0f18",    // Slightly lighter background
-          blue: "#00f2ff",    // The main neon accent
-          purple: "#7000ff",  // Secondary neon accent
-          green: "#00ff88",   // Success state
+          black: "rgb(var(--cyber-black) / <alpha-value>)",
+          dark: "rgb(var(--cyber-dark) / <alpha-value>)",
+          "dark-lighter": "rgba(255, 255, 255, 0.05)",
+          blue: "rgb(var(--cyber-blue) / <alpha-value>)",
+          purple: "rgb(var(--cyber-purple) / <alpha-value>)",
+          green: "rgb(var(--cyber-green) / <alpha-value>)",
+          slate: "rgb(var(--cyber-slate) / <alpha-value>)",
+          white: "rgb(var(--cyber-white) / <alpha-value>)",
         },
       },
       backgroundImage: {
         'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%)',
+        'soft-glow': 'radial-gradient(circle at center, rgb(var(--cyber-blue) / 0.15) 0%, transparent 70%)',
       },
+
       boxShadow: {
-        'neon-blue': '0 0 20px rgba(0, 242, 255, 0.3)',
+        'subtle-blue': '0 0 15px rgb(var(--cyber-blue) / 0.15)',
+        'subtle-purple': '0 0 15px rgb(var(--cyber-purple) / 0.15)',
+        'glass-pro': '0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05)',
+      },
+      dropShadow: {
+        'soft': '0 0 8px rgb(var(--cyber-blue) / 0.3)',
       }
+
     },
   },
   plugins: [],

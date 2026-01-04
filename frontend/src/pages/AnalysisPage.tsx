@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { GlassCard } from "../components/GlassCard";
@@ -16,6 +16,7 @@ import {
   Zap,
   Bug,
   Fingerprint,
+  FileText,
 } from "lucide-react";
 import { analysisApi } from "../api/analysis";
 import type { AnalysisResult } from "../types/analysis";
@@ -25,6 +26,9 @@ export const AnalysisPage = () => {
   const [status, setStatus] = useState<"IDLE" | "SCANNING" | "FINISHED">(
     "IDLE"
   );
+  // DEMO VULNERABILITY: Use this to test the scanner!
+  // const AWS_SECRET = "AKIA1234567890abcdef"; 
+
   const [code, setCode] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
@@ -131,7 +135,7 @@ export const AnalysisPage = () => {
 
   // Color helper for severity
   const getSeverityColor = (sev?: string) => {
-    if (!sev) return "text-blue-500 bg-blue-500/20"; // Default safe fallback
+    if (!sev) return "text-cyber-blue bg-cyber-blue/20"; // Default safe fallback
 
     switch (sev.toLowerCase()) {
       case "critical":
@@ -141,7 +145,7 @@ export const AnalysisPage = () => {
       case "medium":
         return "text-yellow-500 bg-yellow-500/20";
       default:
-        return "text-blue-500 bg-blue-500/20";
+        return "text-cyber-blue bg-cyber-blue/20";
     }
   };
 
@@ -154,13 +158,13 @@ export const AnalysisPage = () => {
             animate={
               isDanger
                 ? {
-                    x: [-1, 1, -1, 0],
-                    filter: [
-                      "hue-rotate(0deg)",
-                      "hue-rotate(90deg)",
-                      "hue-rotate(0deg)",
-                    ],
-                  }
+                  x: [-1, 1, -1, 0],
+                  filter: [
+                    "hue-rotate(0deg)",
+                    "hue-rotate(90deg)",
+                    "hue-rotate(0deg)",
+                  ],
+                }
                 : {}
             }
             transition={{ repeat: Infinity, duration: 0.2 }}
@@ -208,23 +212,22 @@ export const AnalysisPage = () => {
         {/* 2. THE SCANNER CARD */}
         <div className="col-span-12 lg:col-span-7 space-y-6">
           <GlassCard
-            className={`relative overflow-hidden transition-all duration-500 ${
-              isDanger ? "border-red-500/50" : "border-cyber-blue/20"
-            }`}
+            className={`relative overflow-hidden transition-all duration-500 ${isDanger ? "border-red-500/50" : "border-cyber-blue/20"
+              }`}
           >
             {/* LASER SCANNING ANIMATION */}
             <AnimatePresence>
               {status === "SCANNING" && (
                 <motion.div
-                  initial={{ top: "0%" }}
-                  animate={{ top: "100%" }}
+                  initial={{ top: "0%", opacity: 0 }}
+                  animate={{ top: "100%", opacity: 0.3 }}
                   exit={{ opacity: 0 }}
                   transition={{
-                    duration: 1.5,
+                    duration: 2,
                     repeat: Infinity,
                     ease: "linear",
                   }}
-                  className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyber-blue to-transparent shadow-[0_0_20px_#00f2ff] z-10 pointer-events-none"
+                  className="absolute left-0 right-0 h-[1px] bg-cyber-blue z-10 pointer-events-none"
                 />
               )}
             </AnimatePresence>
@@ -243,11 +246,10 @@ export const AnalysisPage = () => {
                   {status === "SCANNING" ? "Uploading..." : "Ready"}
                 </span>
                 <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    status === "SCANNING"
-                      ? "bg-cyber-blue animate-ping"
-                      : "bg-gray-700"
-                  }`}
+                  className={`w-1.5 h-1.5 rounded-full ${status === "SCANNING"
+                    ? "bg-cyber-blue animate-ping"
+                    : "bg-gray-700"
+                    }`}
                 />
               </div>
             </div>
@@ -256,7 +258,7 @@ export const AnalysisPage = () => {
               <textarea
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full h-80 bg-black/60 rounded-xl p-5 font-mono text-sm text-cyber-blue outline-none border border-white/5 resize-none scrollbar-hide focus:border-cyber-blue/30 transition-colors placeholder-gray-700"
+                className="w-full h-80 bg-black/60 rounded-xl p-5 font-mono text-sm text-cyber-green outline-none border border-white/5 resize-none scrollbar-hide focus:border-cyber-blue/30 transition-colors placeholder-gray-700"
                 spellCheck="false"
                 placeholder="// Paste code here for security analysis..."
               />
@@ -270,13 +272,12 @@ export const AnalysisPage = () => {
               whileTap={{ scale: 0.98 }}
               onClick={startScan}
               disabled={status === "SCANNING" || !code}
-              className={`w-full mt-4 py-4 rounded-xl font-black uppercase tracking-[0.3em] flex items-center justify-center space-x-3 transition-all relative overflow-hidden group ${
-                status === "SCANNING"
-                  ? "bg-gray-800 text-gray-500"
-                  : isDanger
+              className={`w-full mt-4 py-4 rounded-xl font-black uppercase tracking-[0.3em] flex items-center justify-center space-x-3 transition-all relative overflow-hidden group ${status === "SCANNING"
+                ? "bg-gray-800 text-gray-500"
+                : isDanger
                   ? "bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.4)] text-white"
-                  : "bg-gradient-to-r from-cyber-blue to-blue-600 text-black shadow-[0_0_30px_rgba(0,242,255,0.4)]"
-              } ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
+                  : "bg-gradient-to-r from-cyber-blue to-cyber-purple text-cyber-black shadow-[0_0_30px_rgb(var(--cyber-blue))] cyber-btn"
+                } ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {status === "SCANNING" ? (
                 <RefreshCw className="animate-spin" size={20} />
@@ -331,11 +332,10 @@ export const AnalysisPage = () => {
                 </span>
                 <motion.span
                   key={isDanger ? "crit" : "sec"}
-                  initial={{ scale: 1.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className={`text-2xl font-black italic tracking-tighter ${
-                    isDanger ? "text-red-500" : "text-cyber-green"
-                  }`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`text-2xl font-black italic tracking-tighter ${isDanger ? "text-red-500" : "text-cyber-green"
+                    }`}
                 >
                   {getRiskScore(result).toFixed(1)}
                 </motion.span>
@@ -346,12 +346,34 @@ export const AnalysisPage = () => {
                     width: result
                       ? `${Math.min(getRiskScore(result) * 10, 100)}%`
                       : "0%",
-                    backgroundColor: isDanger ? "#ef4444" : "#00ff88",
+                    backgroundColor: isDanger ? "#ef4444" : "#93B1A6",
                   }}
                   className="h-full shadow-[0_0_15px_currentColor]"
                 />
               </div>
             </div>
+
+            {/* ANALYZED CODE DISPLAY */}
+            {result && code && (
+              <div className="mb-8 p-4 bg-black/40 rounded-xl border border-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center">
+                    <FileText size={14} className="mr-2 text-cyber-blue" />
+                    Analyzed_Source
+                  </h3>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(code)}
+                    className="text-[9px] font-bold uppercase tracking-wider text-gray-500 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <FileText size={10} />
+                    Copy
+                  </button>
+                </div>
+                <div className="max-h-40 overflow-y-auto custom-scrollbar font-mono text-[10px] text-cyber-white whitespace-pre-wrap break-all pr-2">
+                  {code}
+                </div>
+              </div>
+            )}
 
             {/* DANGER LIST */}
             <AnimatePresence mode="wait">
@@ -445,7 +467,7 @@ export const AnalysisPage = () => {
                   animate={{ opacity: 1 }}
                   className="flex flex-col items-center justify-center h-48 text-center"
                 >
-                  <div className="w-16 h-16 rounded-full bg-slate-800/50 border border-white/5 flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full bg-cyber-dark/50 border border-cyber-slate/20 flex items-center justify-center mb-4">
                     <Activity className="text-gray-600" size={30} />
                   </div>
                   <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest leading-loose">

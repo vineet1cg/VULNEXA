@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -25,12 +25,20 @@ import {
 
 // Animation variants
 const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  hidden: { opacity: 0, scale: 0.98 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      staggerChildren: 0.08,
+      duration: 0.6,
+    }
+  },
 };
+
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0 }
 };
 
 export const DashboardPage = () => {
@@ -88,15 +96,15 @@ export const DashboardPage = () => {
   };
 
   useEffect(() => {
-  // ⛔ Do not fetch until auth is ready
-  if (!user) return;
+    // ⛔ Do not fetch until auth is ready
+    if (!user) return;
 
-  fetchMetrics();
+    fetchMetrics();
 
-  // Auto-refresh every 30 seconds
-  const poller = setInterval(fetchMetrics, 30000);
-  return () => clearInterval(poller);
-}, [user]);
+    // Auto-refresh every 30 seconds
+    const poller = setInterval(fetchMetrics, 30000);
+    return () => clearInterval(poller);
+  }, [user]);
 
 
   // // 2. SIMULATE HARDWARE STATS
@@ -149,16 +157,16 @@ export const DashboardPage = () => {
     currentRiskScore > 70
       ? "critical"
       : currentRiskScore > 40
-      ? "warning"
-      : "secure";
+        ? "warning"
+        : "secure";
 
-      useEffect(() => {
-  const timeout = setTimeout(() => {
-    setLoading(false);
-  }, 5000);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
 
-  return () => clearTimeout(timeout);
-}, []);
+    return () => clearTimeout(timeout);
+  }, []);
 
   if (loading) {
     return (
@@ -182,13 +190,13 @@ export const DashboardPage = () => {
         className="space-y-8"
       >
         {/* --- HEADER --- */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <motion.div variants={item} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-black tracking-tighter text-white">
-              COMMAND_CENTER
+            <h1 className="text-4xl font-black tracking-tighter text-cyber-white">
+              VULNEXA_COMMAND_CENTER
             </h1>
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-[0.3em] mt-1 flex items-center">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse shadow-[0_0_10px_#10b981]" />
+            <p className="text-cyber-slate text-xs font-bold uppercase tracking-[0.3em] mt-1 flex items-center">
+              <span className="w-2 h-2 bg-cyber-green rounded-full mr-2 animate-pulse shadow-[0_0_10px_rgb(var(--cyber-green))]" />
               VULNEXA_CORE v4.0.0 // USER:{" "}
               {user?.name?.toUpperCase() || "ADMIN"}
             </p>
@@ -197,7 +205,7 @@ export const DashboardPage = () => {
           <div className="flex items-center space-x-3">
             <button
               onClick={handleRefresh}
-              className="p-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all active:scale-90"
+              className="p-3 rounded-xl bg-white/5 border border-white/10 text-cyber-slate hover:text-cyber-white hover:bg-white/10 transition-all active:scale-90 cyber-btn"
             >
               <RefreshCcw
                 size={18}
@@ -206,12 +214,12 @@ export const DashboardPage = () => {
             </button>
             <button
               onClick={() => navigate("/analyze")}
-              className="px-6 py-3 rounded-xl bg-cyber-blue text-black font-black text-xs uppercase tracking-widest flex items-center shadow-[0_0_20px_rgba(0,242,255,0.3)] hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all transform hover:-translate-y-1"
+              className="px-6 py-3 rounded-xl bg-cyber-blue text-cyber-black font-black text-xs uppercase tracking-widest flex items-center shadow-[0_0_20px_rgb(var(--cyber-blue))] hover:shadow-[0_0_30px_rgb(var(--cyber-blue))] transition-all transform hover:-translate-y-1 cyber-btn"
             >
               <Plus size={18} className="mr-2" /> New Security Scan
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {error && (
           <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 flex items-center">
@@ -220,7 +228,7 @@ export const DashboardPage = () => {
         )}
 
         {/* --- HUD STATS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
               label: "CPU_USAGE",
@@ -232,7 +240,7 @@ export const DashboardPage = () => {
               label: "NETWORK_LATENCY",
               value: `${latency}ms`,
               icon: Network,
-              color: "text-purple-500",
+              color: "text-cyber-purple",
             },
             {
               label: "TOTAL_SCANS",
@@ -247,15 +255,15 @@ export const DashboardPage = () => {
               color:
                 safeStats.totalVulnerabilities > 0
                   ? "text-red-500"
-                  : "text-emerald-500",
+                  : "text-cyber-green",
             },
           ].map((stat, i) => (
             <GlassCard
               key={i}
-              className="flex items-center justify-between p-5 border-white/5 hover:border-white/20 transition-colors cursor-default group"
+              className="flex items-center justify-between p-5 border-white/5 hover:border-cyber-blue/30 transition-colors cursor-default group"
             >
               <div>
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                <p className="text-[10px] font-bold text-cyber-slate uppercase tracking-widest">
                   {stat.label}
                 </p>
                 <p className={`text-2xl font-black mt-1 ${stat.color}`}>
@@ -263,12 +271,12 @@ export const DashboardPage = () => {
                 </p>
               </div>
               <stat.icon
-                className="text-gray-700 group-hover:text-white transition-colors"
+                className="text-cyber-slate group-hover:text-cyber-white transition-colors"
                 size={24}
               />
             </GlassCard>
           ))}
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-12 gap-6">
           {/* --- MAIN SECURITY RADAR --- */}
@@ -295,17 +303,17 @@ export const DashboardPage = () => {
                   {
                     label: "HIGH",
                     val: safeStats.severity.High,
-                    color: "bg-orange-500",
+                    color: "bg-cyber-purple",
                   },
                   {
                     label: "MEDIUM",
                     val: safeStats.severity.Medium,
-                    color: "bg-yellow-500",
+                    color: "bg-cyber-blue/60",
                   },
                   {
                     label: "LOW",
                     val: safeStats.severity.Low,
-                    color: "bg-emerald-500",
+                    color: "bg-cyber-green",
                   },
                 ].map((bar, i) => (
                   <div key={i}>
@@ -322,7 +330,7 @@ export const DashboardPage = () => {
                           width: `${Math.min(
                             100,
                             (bar.val / (safeStats.totalVulnerabilities || 1)) *
-                              100
+                            100
                           )}%`,
                         }}
                         transition={{ duration: 1, delay: i * 0.1 }}
@@ -405,8 +413,8 @@ export const DashboardPage = () => {
         </div>
 
         {/* --- BOTTOM TOOLS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer">
+        <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer glow-stagger">
             <div className="p-3 rounded-lg bg-cyber-blue/10 text-cyber-blue">
               <Server size={20} />
             </div>
@@ -417,8 +425,8 @@ export const DashboardPage = () => {
               </p>
             </div>
           </div>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer">
-            <div className="p-3 rounded-lg bg-purple-500/10 text-purple-500">
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer glow-stagger">
+            <div className="p-3 rounded-lg bg-cyber-purple/10 text-cyber-purple">
               <Download size={20} />
             </div>
             <div>
@@ -428,8 +436,8 @@ export const DashboardPage = () => {
               </p>
             </div>
           </div>
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer">
-            <div className="p-3 rounded-lg bg-emerald-500/10 text-emerald-500">
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex items-center space-x-4 hover:bg-white/[0.08] transition-all cursor-pointer glow-stagger">
+            <div className="p-3 rounded-lg bg-cyber-green/10 text-cyber-green">
               <ShieldCheck size={20} />
             </div>
             <div>
@@ -439,7 +447,7 @@ export const DashboardPage = () => {
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     </DashboardLayout>
   );
