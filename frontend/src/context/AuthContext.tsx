@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1120] overflow-hidden">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-cyber-black overflow-hidden">
         <style>{`
           @keyframes gradient-drift {
             0% { background-position: 0% 50%; }
@@ -137,29 +137,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         `}</style>
 
-        <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-indigo-900 via-slate-900 to-black animate-[gradient-drift_10s_ease_infinite] bg-[length:400%_400%]" />
+        <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-cyber-blue/10 via-cyber-dark to-black animate-[gradient-drift_10s_ease_infinite] bg-[length:400%_400%]" />
         <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
         <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          <div className="w-full h-[20vh] bg-gradient-to-b from-transparent via-indigo-500/10 to-transparent animate-[scan-vertical_3s_linear_infinite]" />
+          <div className="w-full h-[20vh] bg-gradient-to-b from-transparent via-cyber-blue/10 to-transparent animate-[scan-vertical_3s_linear_infinite]" />
         </div>
 
         <div className="relative z-10 flex flex-col items-center">
           <div className="relative mb-8">
-            <div className="absolute inset-0 border border-indigo-500/30 rounded-full animate-[pulse-ring_3s_linear_infinite]" />
-            <div className="absolute inset-0 border border-blue-500/20 rounded-full animate-[pulse-ring_3s_linear_infinite_1s]" />
+            <div className="absolute inset-0 border border-cyber-blue/30 rounded-full animate-[pulse-ring_3s_linear_infinite]" />
+            <div className="absolute inset-0 border border-cyber-purple/20 rounded-full animate-[pulse-ring_3s_linear_infinite_1s]" />
 
-            <div className="relative h-16 w-16 bg-gradient-to-tr from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/50">
+            <div className="relative h-16 w-16 bg-gradient-to-tr from-cyber-blue to-cyber-purple rounded-xl flex items-center justify-center shadow-lg shadow-cyber-blue/50">
               <span className="text-3xl font-bold text-white animate-pulse">V</span>
             </div>
 
-            <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald-500 rounded-full border-2 border-slate-900 shadow-[0_0_10px_#10b981] animate-bounce" />
+            <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-cyber-green rounded-full border-2 border-cyber-black shadow-[0_0_10px_#10b981] animate-bounce" />
           </div>
 
-          <div className="w-64 h-1.5 bg-slate-800 rounded-full overflow-hidden relative mb-4 ring-1 ring-slate-700">
-            <div className="absolute inset-0 bg-indigo-600/20" />
+          <div className="w-64 h-1.5 bg-cyber-dark rounded-full overflow-hidden relative mb-4 ring-1 ring-cyber-slate/30 shimmer-effect">
+            <div className="absolute inset-0 bg-cyber-blue/20" />
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 animate-[gradient-drift_2s_linear_infinite] bg-[length:200%_100%]"
+              className="h-full bg-gradient-to-r from-cyber-blue via-cyber-purple to-cyber-blue animate-[gradient-drift_2s_linear_infinite] bg-[length:200%_100%]"
               style={{ width: "60%", borderRadius: "99px" }}
             />
           </div>
@@ -168,9 +168,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             <h2 className="text-white font-bold tracking-[0.2em] text-sm uppercase animate-pulse">
               Initializing Core
             </h2>
-            <p className="text-slate-500 text-xs font-mono">
-              Verifying encryption keys...
-            </p>
+            <div className="flex justify-center">
+              <p className="text-cyber-slate text-xs font-mono typewriter">
+                Verifying encryption keys...
+              </p>
+            </div>
           </div>
         </div>
       </div>

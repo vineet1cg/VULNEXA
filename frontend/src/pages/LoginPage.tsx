@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import { ShieldCheck, Lock, Cpu, Activity } from "lucide-react";
-import { GlassCard } from "../components/GlassCard"; // Ensure this is imported
+import { GlassCard } from "../components/GlassCard";
 import "./DashboardAnimations.css";
 
 export const LoginPage = () => {
@@ -13,24 +13,15 @@ export const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-cyber-black flex items-center justify-center relative overflow-hidden bg-noise-subtle">
-
-      {/* Background Ambience */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-cyber-blue/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-cyber-purple/10 rounded-full blur-[120px] animate-pulse" />
-      </div>
-
+    <div className="min-h-screen bg-cyber-black flex items-center justify-center relative overflow-hidden bg-grid-pattern">
       <GlassCard className="w-full max-w-md p-8 relative z-10 border-t-2 border-t-cyber-blue/50 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-
         {/* Header Section */}
         <div className="text-center mb-10">
           <div className="relative inline-block mb-4">
-            <div className="absolute inset-0 bg-cyber-blue/20 blur-xl rounded-full" />
+            <div className="absolute inset-0 bg-cyber-blue/10 blur-xl rounded-full" />
             <div className="relative w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-md">
               <ShieldCheck size={32} className="text-cyber-blue" />
             </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-cyber-green rounded-full border-2 border-black animate-pulse" />
           </div>
 
           <h1 className="text-3xl font-black tracking-tighter text-white">VULNEXA<span className="text-cyber-blue">_CORE</span></h1>
@@ -75,7 +66,7 @@ export const LoginPage = () => {
               />
             </div>
             {/* DEV LOGIN BYPASS */}
-            {/* <div className="flex justify-center pt-4 border-t border-white/5 mt-4">
+            <div className="flex justify-center pt-4 border-t border-white/5 mt-4">
               <button
                 onClick={async () => {
                   try {
@@ -85,11 +76,11 @@ export const LoginPage = () => {
                     setError("Dev Login failed");
                   }
                 }}
-                className="text-[10px] text-gray-600 hover:text-cyber-blue underline font-mono uppercase tracking-widest transition-colors"
+                className="text-xs font-bold text-cyber-green hover:text-white underline font-mono uppercase tracking-[0.2em] transition-colors"
               >
                 [ BYPASS_AUTH_PROTOCOL ]
               </button>
-            </div> */}
+            </div>
           </div>
 
           <div className="flex justify-between items-center text-[10px] text-gray-600 font-mono uppercase">
@@ -97,7 +88,6 @@ export const LoginPage = () => {
             <span className="flex items-center"><Activity size={10} className="mr-1 text-cyber-green" /> Nodes Online</span>
           </div>
         </div>
-
       </GlassCard>
     </div>
   );

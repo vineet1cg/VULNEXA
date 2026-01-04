@@ -9,12 +9,92 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  @apply bg-cyber-black text-white antialiased;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+:root {
+  /* Modern SaaS Palette (Finfoco/Boltshift Style) */
+  --cyber-black: 5 5 10;      /* Rich Black - Deepest Background */
+  --cyber-dark: 19 21 31;     /* Dark Grey/Violet - Cards & Panels */
+  
+  --cyber-blue: 217 70 239;   /* Fuchsia 500 - Primary Brand Color (Pink/Magenta) */
+  --cyber-purple: 139 92 246; /* Violet 500 - Secondary Accent */
+  --cyber-green: 16 185 129;  /* Emerald 500 - Success Status */
+  
+  --cyber-slate: 148 163 184; /* Slate 400 - Muted Text */
+  --cyber-white: 248 250 252; /* Slate 50 - High Contrast Text */
+  
+  --glow-opacity: 0.06;       /* Soft ambient glows */
 }
 
+
+body {
+  background-color: rgb(var(--cyber-black));
+  color: rgb(var(--cyber-white));
+  @apply antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  letter-spacing: -0.011em;
+}
+
+
+
 .bg-grid-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.hud-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgb(var(--cyber-blue) / 0.3);
+  pointer-events: none;
+  transition: border-color 0.3s ease;
+}
+
+.group:hover .hud-corner {
+  border-color: rgb(var(--cyber-blue) / 0.8);
+}
+
+.hud-tl {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.hud-tr {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.hud-bl {
+  bottom: 0;
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+
+.hud-br {
+  bottom: 0;
+  right: 0;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Global Professional Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/5 border-4 border-solid border-cyber-black rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-white/10;
 }
