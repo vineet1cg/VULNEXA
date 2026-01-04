@@ -37,7 +37,7 @@ export const GlassCard = ({ children, className = "" }: GlassCardProps) => {
           background: useMotionTemplate`
             radial-gradient(
               600px circle at ${mouseX}px ${mouseY}px,
-              rgba(255, 45, 117, 0.12),
+              rgba(255, 255, 255, 0.03),
               transparent 80%
             )
           `,

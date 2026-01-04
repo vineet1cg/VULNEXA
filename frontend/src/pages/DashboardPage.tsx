@@ -214,7 +214,7 @@ export const DashboardPage = () => {
             </button>
             <button
               onClick={() => navigate("/analyze")}
-              className="px-6 py-3 rounded-xl bg-cyber-blue text-cyber-black font-black text-xs uppercase tracking-widest flex items-center shadow-[0_0_20px_rgb(var(--cyber-blue))] hover:shadow-[0_0_30px_rgb(var(--cyber-blue))] transition-all transform hover:-translate-y-1 cyber-btn"
+              className="px-6 py-3 rounded-xl bg-cyber-blue text-cyber-black font-black text-xs uppercase tracking-widest flex items-center shadow-lg shadow-blue-900/20 hover:shadow-xl hover:bg-cyber-blue/90 transition-all cyber-btn"
             >
               <Plus size={18} className="mr-2" /> New Security Scan
             </button>
@@ -260,7 +260,7 @@ export const DashboardPage = () => {
           ].map((stat, i) => (
             <GlassCard
               key={i}
-              className="flex items-center justify-between p-5 border-white/5 hover:border-cyber-blue/30 transition-colors cursor-default group"
+              className="flex items-center justify-between p-5 border-white/5 hover:border-white/20 transition-colors cursor-default group"
             >
               <div>
                 <p className="text-[10px] font-bold text-cyber-slate uppercase tracking-widest">

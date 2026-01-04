@@ -19,8 +19,9 @@ export default {
         },
       },
       backgroundImage: {
-        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%)',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%)',
         'soft-glow': 'radial-gradient(circle at center, rgb(var(--cyber-blue) / 0.15) 0%, transparent 70%)',
+        'purple-glow': 'radial-gradient(circle at center, rgb(var(--cyber-purple) / 0.15) 0%, transparent 70%)',
       },
 
       boxShadow: {
