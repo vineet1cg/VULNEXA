@@ -4,7 +4,7 @@ import mongoose from "mongoose";
  * ------------------------------------------------------
  * Vulnerability Subdocument Schema
  * ------------------------------------------------------
- * Stores analyzed security findings (NO raw input content)
+ * Stores PURE security findings (no explanations)
  */
 const vulnerabilitySchema = new mongoose.Schema(
   {
@@ -13,7 +13,7 @@ const vulnerabilitySchema = new mongoose.Schema(
       required: true,
     },
 
-    name: {
+    type: {
       type: String,
       required: true,
       maxlength: 120,
@@ -21,7 +21,7 @@ const vulnerabilitySchema = new mongoose.Schema(
 
     severity: {
       type: String,
-      enum: ["Critical", "High", "Medium", "Low"],
+      enum: ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
       required: true,
       index: true,
     },
@@ -31,19 +31,9 @@ const vulnerabilitySchema = new mongoose.Schema(
       maxlength: 500,
     },
 
-    attackerLogic: {
+    location: {
       type: String,
-      maxlength: 500,
-    },
-
-    defenderLogic: {
-      type: String,
-      maxlength: 500,
-    },
-
-    secureCodeFix: {
-      type: String,
-      maxlength: 1000,
+      maxlength: 200,
     },
   },
   { _id: false }
@@ -53,7 +43,7 @@ const vulnerabilitySchema = new mongoose.Schema(
  * ------------------------------------------------------
  * Analysis Schema
  * ------------------------------------------------------
- * Ethical, privacy-safe, production-ready
+ * Ethical, privacy-safe, storage-minimal
  */
 const analysisSchema = new mongoose.Schema(
   {
@@ -72,7 +62,6 @@ const analysisSchema = new mongoose.Schema(
     },
 
     // Raw content is intentionally NOT stored
-    // Optional hash for future comparison / deduplication
     contentHash: {
       type: String,
       maxlength: 128,
@@ -178,9 +167,5 @@ analysisSchema.statics.getRecentAnalyses = async function (userId, limit = 10) {
     .lean();
 };
 
-/* ------------------------------------------------------
- * Model Export
- * ------------------------------------------------------ */
 const Analysis = mongoose.model("Analysis", analysisSchema);
-
 export default Analysis;

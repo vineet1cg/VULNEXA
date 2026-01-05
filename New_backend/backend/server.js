@@ -10,9 +10,9 @@ import { normalizeSeverity } from "../security-engine/utils/normalizeSeverity.js
 import { calculateRiskScore } from "../security-engine/riskEngine.js";
 
 /* ---------------- AI + Decision ---------------- */
-import { runAIAnalysis } from "../services/aiAnalysis.service.js";
-import { decideAnalysisMode } from "../services/decision.service.js";
-
+import { runAIAnalysis } from "./services/aiAnalysis.service.js";
+import { decideAnalysisMode } from "./services/decision.service.js";
+import aiRoutes from "./routes/ai.routes.js";
 /* --------------------------------------------------
  * Constants
  * -------------------------------------------------- */
@@ -25,6 +25,12 @@ const AI_RISK_THRESHOLD = 80;
  * -------------------------------------------------- */
 const hashContent = (content) =>
   crypto.createHash("sha256").update(content).digest("hex");
+
+/* --------------------------------------------------
+ * Routes
+ * -------------------------------------------------- */
+
+app.use("/api/ai", aiRoutes);
 
 /* ==================================================
  * POST /api/analyze
