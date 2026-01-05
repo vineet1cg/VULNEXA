@@ -31,7 +31,7 @@ export function detectHardcodedSecrets(normalizedInput) {
     if (match) {
       issues.push({
         type: "Hardcoded Secret",
-        severity: "high", // ✅ engine-level, normalized later
+        severity: "HIGH", // ✅ engine-level, normalized later
         owasp: "A02:2021 - Cryptographic Failures",
         description: `A ${label} appears to be hardcoded in the source code or configuration file.`,
         recommendation:

@@ -1,6 +1,6 @@
 /**
- * Detects potential SQL Injection vulnerabilities in code input.
- * This is a static pattern-based detection and does not execute queries.
+ * Detects potential SQL Injection vulnerabilities.
+ * Assumes unknown variables are tainted by default.
  */
 export function detectSQLInjection(normalizedInput) {
   if (
@@ -14,24 +14,34 @@ export function detectSQLInjection(normalizedInput) {
   const issues = [];
 
   const sqlKeywords = /\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER)\b/i;
-  const userInput = /\breq\.(query|body|params|headers|cookies)\b/;
-  const concat = /(\+)|(`.*\$\{.*\}`)/;
+
+  const stringConcat = /(["'`].*["'`]\s*\+)|(\+\s*["'`])|(`.*\$\{.*\}`)/;
+
+  const paramizedSafe = /\b(\?|:\w+)\b/; // prepared statements
+
 
   for (const block of normalizedInput.blocks) {
-    const code =
-      block?.content?.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "") || "";
+    const code = block?.content?.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "") || "";
 
     if (!code) continue;
 
-    if (sqlKeywords.test(code) && userInput.test(code) && concat.test(code)) {
+    // SQL keyword present
+    if (!sqlKeywords.test(code)) continue;
+
+    // Safe parameterized usage → skip
+    if (paramizedSafe.test(code)) continue;
+
+    // Dangerous concatenation
+    if (stringConcat.test(code)) {
       issues.push({
         type: "SQL Injection",
-        severity: "CRITICAL", // ✅ ENUM SAFE
+        severity: "HIGH", // ⚠️ correct for static heuristic
+        confidence: "MEDIUM",
         owasp: "A03:2021 - Injection",
         description:
-          "SQL queries are constructed using string concatenation with user-controlled input, which may allow attackers to manipulate query logic.",
+          "SQL query is dynamically constructed using string concatenation. If the interpolated variable is user-controlled, this can lead to SQL injection.",
         recommendation:
-          "Use parameterized queries or prepared statements provided by the database driver.",
+          "Use parameterized queries or prepared statements instead of string concatenation.",
         location: block.location || null,
       });
     }

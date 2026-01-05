@@ -9,11 +9,16 @@ import { analyzeInput } from "../security-engine/index.js";
 import { normalizeSeverity } from "../security-engine/utils/normalizeSeverity.js";
 import { calculateRiskScore } from "../security-engine/riskEngine.js";
 
+/* ---------------- AI + Decision ---------------- */
+import { runAIAnalysis } from "../services/aiAnalysis.service.js";
+import { decideAnalysisMode } from "../services/decision.service.js";
+
 /* --------------------------------------------------
  * Constants
  * -------------------------------------------------- */
 const ALLOWED_INPUT_TYPES = new Set(["code", "api", "sql", "config"]);
 const MAX_CONTENT_LENGTH = 100_000;
+const AI_RISK_THRESHOLD = 80;
 
 /* --------------------------------------------------
  * Utils
@@ -26,7 +31,7 @@ const hashContent = (content) =>
  * ================================================== */
 export const analyzeCode = async (req, res) => {
   try {
-    const { inputType, content } = req.body;
+    const { inputType, content, useAI = false } = req.body;
     const userId = req.userId;
 
     /* ---------- Auth ---------- */
@@ -37,7 +42,7 @@ export const analyzeCode = async (req, res) => {
       });
     }
 
-    /* ---------- Input validation ---------- */
+    /* ---------- Input Validation ---------- */
     if (!inputType || !content) {
       return res.status(400).json({
         success: false,
@@ -59,7 +64,34 @@ export const analyzeCode = async (req, res) => {
       });
     }
 
-    /* ---------- Run Security Engine ---------- */
+    /* ==================================================
+     * AI-ONLY MODE (USER BYPASS)
+     * ================================================== */
+    if (useAI === true) {
+      const aiMessage = await runAIAnalysis({
+        code: content,
+        language: inputType,
+        findings: [],
+      });
+
+      return res.status(200).json({
+        success: true,
+        mode: "AI_ONLY",
+        ai: {
+          enabled: true,
+          advisoryOnly: true,
+          message: aiMessage,
+        },
+        ethics: {
+          aiAdvisoryOnly: true,
+          notPersisted: true,
+        },
+      });
+    }
+
+    /* ==================================================
+     * SECURITY ENGINE (AUTHORITATIVE PATH)
+     * ================================================== */
     const engineResult = analyzeInput({ inputType, content });
 
     if (!engineResult || engineResult.error) {
@@ -82,17 +114,23 @@ export const analyzeCode = async (req, res) => {
     const normalizedVulnerabilities = vulnerabilities.map((v, i) => ({
       id: `vuln-${Date.now()}-${i}`,
       name: v.type,
-      severity: normalizeSeverity(v.severity), // enum-safe
+      severity: normalizeSeverity(v.severity),
       description: v.description,
       attackerLogic: attackerView[i]?.abuseLogic || null,
       defenderLogic: defenderFixes[i]?.secureFix || null,
       secureCodeFix: defenderFixes[i]?.secureExample || null,
     }));
 
-    /* ---------- Risk Score (DAMPENED MODEL) ---------- */
+    /* ---------- Canonical Risk Score ---------- */
     const overallRiskScore = calculateRiskScore(normalizedVulnerabilities);
 
-    /* ---------- Persist Analysis ---------- */
+    /* ---------- Decide Analysis Mode ---------- */
+    const analysisMode = decideAnalysisMode({
+      useAI: false,
+      riskScore: overallRiskScore,
+    });
+
+    /* ---------- Persist Security Analysis ---------- */
     const analysis = await Analysis.create({
       userId,
       inputType,
@@ -103,14 +141,13 @@ export const analyzeCode = async (req, res) => {
       analysisDate: new Date(),
     });
 
-    await User.updateOne(
-      { _id: userId },
-      { $inc: { analysisCount: 1 } }
-    );
+    await User.updateOne({ _id: userId }, { $inc: { analysisCount: 1 } });
 
     /* ---------- Response ---------- */
     return res.status(200).json({
       success: true,
+      mode: analysisMode,
+      aiRecommended: overallRiskScore >= AI_RISK_THRESHOLD,
       analysis: {
         id: analysis._id,
         inputType,
