@@ -1,4 +1,4 @@
-import { LayoutDashboard, ShieldCheck, History, Terminal } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, History, Terminal, ArrowLeft, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -22,7 +22,12 @@ const SidebarItem = ({ icon: Icon, label, path, active }: any) => {
 export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleSignOut = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const getInitials = (name: string) => {
     if (!name) return "AU";
@@ -51,9 +56,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
         {/* User Profile */}
         <div className="mt-auto border-t border-white/5 pt-6">
-
-
-          <div className="flex items-center space-x-3 mb-6 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+          <div className="flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
             <div className="w-10 h-10 rounded-lg bg-cyber-dark-lighter border border-white/10 flex items-center justify-center text-cyber-blue font-black text-xs">
               {getInitials(user?.name || "Admin User")}
             </div>
@@ -63,6 +66,24 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                 <span className="w-1.5 h-1.5 rounded-full bg-cyber-green mr-2" /> Online
               </p>
             </div>
+          </div>
+
+          {/* Back Button */}
+          <div
+            onClick={() => navigate('/')}
+            className="flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-300 group mb-2 text-cyber-slate hover:bg-white/5 hover:text-cyber-white active:scale-95"
+          >
+            <ArrowLeft size={18} className="text-cyber-slate group-hover:text-cyber-white transition-colors" />
+            <span className="font-semibold text-sm tracking-tight">Back to Home</span>
+          </div>
+
+          {/* Sign Out Button */}
+          <div
+            onClick={handleSignOut}
+            className="flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-300 group text-red-400/70 hover:bg-red-500/10 hover:text-red-400 active:scale-95 border border-red-500/20 hover:border-red-500/40"
+          >
+            <LogOut size={18} className="transition-colors" />
+            <span className="font-semibold text-sm tracking-tight">Sign Out</span>
           </div>
         </div>
       </aside>

@@ -260,12 +260,22 @@ const LandingPage: React.FC = () => {
                     </p>
 
                     <div className="reveal-mask flex flex-col sm:flex-row gap-6 justify-center">
-                        <button onClick={handleLaunch} className="group relative px-8 py-4 bg-white text-black font-bold rounded-lg hover:scale-105 transition-transform overflow-hidden cursor-pointer">
+                        <button 
+                            onClick={() => navigate('/login')} 
+                            className="group relative px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 hover:scale-105 transition-all overflow-hidden cursor-pointer shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                        >
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity" />
-                            <span>INITIALIZE DEMO</span>
+                            <span className="relative z-10">BLUE TEAM</span>
                         </button>
-                        <button className="px-8 py-4 border border-gray-700 text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
-                            VIEW ARCHITECTURE
+                        <button 
+                            onClick={() => {
+                                // Red Team functionality - will be implemented later
+                                console.log('Red Team clicked');
+                            }}
+                            className="group relative px-8 py-4 bg-red-600 text-white font-bold rounded-lg hover:bg-red-500 hover:scale-105 transition-all overflow-hidden cursor-pointer shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 opacity-0 group-hover:opacity-20 transition-opacity" />
+                            <span className="relative z-10">RED TEAM</span>
                         </button>
                     </div>
                 </div>
