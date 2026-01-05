@@ -90,9 +90,9 @@
 
 /* --- CURSOR FIXES --- */
 
-/* 1. Hide the default mouse on the whole page */
+/* 1. Show default cursor on the whole page */
 .min-h-screen {
-  cursor: none !important;
+  cursor: default;
 }
 
 /* 2. Style the Custom Cursor */

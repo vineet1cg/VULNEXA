@@ -15,7 +15,6 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-main);
     overflow-x: hidden;
-    cursor: none;
     
     /* Subtle "Event Horizon" Glow */
     background-image: radial-gradient(
@@ -26,13 +25,13 @@ body {
     min-height: 100vh;
 }
 
-/* Force hide default cursor on all interactive elements */
+/* Interactive elements use default cursor */
 a,
 button,
 input,
 textarea,
 select {
-    cursor: none !important;
+    cursor: pointer;
 }
 
 /* --- 1. CUSTOM CURSOR (Fixed) --- */
@@ -83,9 +82,9 @@ select {
   z-index: 99999 !important; 
 }
 
-/* Ensure default cursor doesn't appear on nav links */
+/* Nav elements use default cursor */
 nav, nav a, nav button {
-  cursor: none !important;
+  cursor: pointer;
 }
 
 /* --- NAVBAR CONTAINER --- */
@@ -432,8 +431,7 @@ nav::before {
 .faq-item {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     transition: background-color 0.3s;
-    cursor: none;
-    /* Ensures custom cursor works here too */
+    cursor: pointer;
 }
 
 .faq-item:hover {

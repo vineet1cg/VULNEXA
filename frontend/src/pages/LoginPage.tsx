@@ -66,8 +66,7 @@ export const LoginPage = () => {
   }, []);
 
   return (
-    // Added 'cursor-none' class here to force hide system mouse
-    <div className="min-h-screen bg-[#020408] flex items-center justify-center relative overflow-hidden cursor-none">
+    <div className="min-h-screen bg-[#020408] flex items-center justify-center relative overflow-hidden">
 
       {/* --- CUSTOM CURSOR ELEMENT --- */}
       <div ref={cursorRef} className="custom-cursor" />

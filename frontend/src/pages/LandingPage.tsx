@@ -221,13 +221,13 @@ const LandingPage: React.FC = () => {
                                 key={item}
                                 href={`#${item.toLowerCase()}`}
                                 onClick={(e) => scrollToSection(e, `#${item.toLowerCase()}`)}
-                                className="hover:text-white transition-colors cursor-none"
+                                className="hover:text-white transition-colors cursor-pointer"
                             >
                                 {item}
                             </a>
                         ))}
                     </div>
-                    <button onClick={handleLaunch} className="px-5 py-2 bg-blue-500/10 border border-blue-500/50 text-blue-400 rounded hover:bg-blue-500 hover:text-white transition-all duration-300 font-mono text-xs tracking-wider cursor-none">
+                    <button onClick={handleLaunch} className="px-5 py-2 bg-blue-500/10 border border-blue-500/50 text-blue-400 rounded hover:bg-blue-500 hover:text-white transition-all duration-300 font-mono text-xs tracking-wider cursor-pointer">
                         LAUNCH CONSOLE
                     </button>
                 </div>
@@ -260,11 +260,11 @@ const LandingPage: React.FC = () => {
                     </p>
 
                     <div className="reveal-mask flex flex-col sm:flex-row gap-6 justify-center">
-                        <button onClick={handleLaunch} className="group relative px-8 py-4 bg-white text-black font-bold rounded-lg hover:scale-105 transition-transform overflow-hidden cursor-none">
+                        <button onClick={handleLaunch} className="group relative px-8 py-4 bg-white text-black font-bold rounded-lg hover:scale-105 transition-transform overflow-hidden cursor-pointer">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity" />
                             <span>INITIALIZE DEMO</span>
                         </button>
-                        <button className="px-8 py-4 border border-gray-700 text-white rounded-lg hover:bg-white/5 transition-colors cursor-none">
+                        <button className="px-8 py-4 border border-gray-700 text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
                             VIEW ARCHITECTURE
                         </button>
                     </div>
@@ -474,10 +474,10 @@ const LandingPage: React.FC = () => {
                     <h2 className="text-5xl font-bold text-white mb-8">Secure your infrastructure.</h2>
                     <p className="text-gray-400 mb-10">Join 10,000+ engineers shipping secure code faster.</p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button onClick={handleLaunch} className="px-10 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] cursor-none">
+                        <button onClick={handleLaunch} className="px-10 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] cursor-pointer">
                             Start Free Trial
                         </button>
-                        <button className="px-10 py-4 border border-gray-700 text-gray-300 rounded-lg hover:border-white hover:text-white transition-all cursor-none">
+                        <button className="px-10 py-4 border border-gray-700 text-gray-300 rounded-lg hover:border-white hover:text-white transition-all cursor-pointer">
                             Talk to Sales
                         </button>
                     </div>
@@ -486,9 +486,9 @@ const LandingPage: React.FC = () => {
 
             <footer className="py-12 border-t border-white/5 text-center text-gray-600 font-mono text-xs">
                 <div className="mb-4 flex justify-center gap-6">
-                    <a href="#" className="hover:text-blue-400 transition-colors cursor-none">TWITTER</a>
-                    <a href="#" className="hover:text-blue-400 transition-colors cursor-none">GITHUB</a>
-                    <a href="#" className="hover:text-blue-400 transition-colors cursor-none">LINKEDIN</a>
+                    <a href="#" className="hover:text-blue-400 transition-colors cursor-pointer">TWITTER</a>
+                    <a href="#" className="hover:text-blue-400 transition-colors cursor-pointer">GITHUB</a>
+                    <a href="#" className="hover:text-blue-400 transition-colors cursor-pointer">LINKEDIN</a>
                 </div>
                 <p>VULNEXA // SECURITY_INTELLIGENCE_PLATFORM</p>
                 <p className="mt-2">© 2026 ALL RIGHTS RESERVED</p>
