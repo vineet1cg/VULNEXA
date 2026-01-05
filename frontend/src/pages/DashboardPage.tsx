@@ -205,7 +205,7 @@ export const DashboardPage = () => {
           <div className="flex items-center space-x-3">
             <button
               onClick={handleRefresh}
-              className="p-3 rounded-xl bg-white/5 border border-white/10 text-cyber-slate hover:text-cyber-white hover:bg-white/10 transition-all active:scale-90 cyber-btn"
+              className="btn btn-ghost btn-underline btn-icon-shift btn-scanline btn-border-beam"
             >
               <RefreshCcw
                 size={18}
@@ -214,7 +214,7 @@ export const DashboardPage = () => {
             </button>
             <button
               onClick={() => navigate("/analyze")}
-              className="px-6 py-3 rounded-xl bg-cyber-blue text-cyber-black font-black text-xs uppercase tracking-widest flex items-center shadow-lg shadow-blue-900/20 hover:shadow-xl hover:bg-cyber-blue/90 transition-all cyber-btn"
+              className="btn btn-primary btn-advanced btn-tilt btn-icon-shift btn-scanline btn-border-beam"
             >
               <Plus size={18} className="mr-2" /> New Security Scan
             </button>
@@ -234,19 +234,19 @@ export const DashboardPage = () => {
               label: "CPU_USAGE",
               value: `${cpuUsage}%`,
               icon: Cpu,
-              color: "text-cyber-blue",
+              color: "text-cyber-indigo",
             },
             {
               label: "NETWORK_LATENCY",
               value: `${latency}ms`,
               icon: Network,
-              color: "text-cyber-purple",
+              color: "text-cyber-cyan",
             },
             {
               label: "TOTAL_SCANS",
               value: safeStats.totalScans,
               icon: Terminal,
-              color: "text-white",
+              color: "text-cyber-amber",
             },
             {
               label: "VULN_DETECTED",

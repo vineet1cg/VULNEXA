@@ -11,17 +11,25 @@ html {
 
 :root {
   /* Modern SaaS Palette (Finfoco/Boltshift Style) */
-  --cyber-black: 5 5 10;      /* Rich Black - Deepest Background */
-  --cyber-dark: 19 21 31;     /* Dark Grey/Violet - Cards & Panels */
+  --cyber-black: 6 8 14;
+  --cyber-dark: 12 16 26;
   
-  --cyber-blue: 217 70 239;   /* Fuchsia 500 - Primary Brand Color (Pink/Magenta) */
-  --cyber-purple: 139 92 246; /* Violet 500 - Secondary Accent */
+  --cyber-blue: 37 99 235;      /* Blue 600 - Primary Accent */
+  --cyber-purple: 29 78 216;    /* Blue 700 - Secondary Accent */
   --cyber-green: 16 185 129;  /* Emerald 500 - Success Status */
+  --cyber-cyan: 6 182 212;
+  --cyber-indigo: 79 70 229;
+  --cyber-amber: 245 158 11;
+  --cyber-rose: 244 63 94;
+  --cyber-orange: 234 88 12;
+  --cyber-yellow: 234 179 8;
+  --cyber-teal: 20 184 166;
+  --cyber-pink: 236 72 153;
   
   --cyber-slate: 148 163 184; /* Slate 400 - Muted Text */
   --cyber-white: 248 250 252; /* Slate 50 - High Contrast Text */
   
-  --glow-opacity: 0.06;       /* Soft ambient glows */
+  --glow-opacity: 0.04;       /* Softer ambient glows */
 }
 
 
