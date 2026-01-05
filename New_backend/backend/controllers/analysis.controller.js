@@ -333,7 +333,7 @@ export async function getAnalysisHistory(req, res) {
 export async function getAnalysisById(req, res) {
   const analysis = await Analysis.findOne({
     _id: req.params.id,
-    user: req.user.id,
+    userId: req.user.id,
   });
 
   if (!analysis) {
