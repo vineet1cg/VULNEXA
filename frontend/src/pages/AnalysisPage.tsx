@@ -670,16 +670,16 @@ export const AnalysisPage = () => {
               </div>
             </div>
             
-            <div className="h-[500px] w-full bg-black/40 rounded-xl border border-white/5 p-4">
+            <div className="w-full bg-transparent p-4">
               <CodeAnalysisGraph
-                width={800}
-                height={500}
                 data={transformToGraphData(result) || undefined}
+                riskScore={getRiskScore(result)}
+                vulnerabilityCount={result.vulnerabilities?.length || 0}
               />
             </div>
             
             <div className="mt-4 text-[9px] text-gray-500 font-mono text-center">
-              Interactive visualization of code structure and detected vulnerabilities
+              Comprehensive risk analysis and security metrics visualization
             </div>
           </GlassCard>
         </motion.div>
