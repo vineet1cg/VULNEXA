@@ -1,206 +1,347 @@
-import mongoose from "mongoose";
-import crypto from "crypto";
+// import mongoose from "mongoose";
+// import crypto from "crypto";
+
+// import Analysis from "../models/Analysis.js";
+// import User from "../models/User.js";
+// import { runCombinedAnalysis } from "../services/combinedAnalysis.service.js";
+
+// /* --------------------------------------------------
+//  * Constants
+//  * -------------------------------------------------- */
+// const ALLOWED_INPUT_TYPES = new Set(["code", "api", "sql", "config"]);
+// const MAX_CONTENT_LENGTH = 100_000;
+
+// const hashContent = (content) =>
+//   crypto.createHash("sha256").update(content).digest("hex");
+
+// /* ==================================================
+//  * POST /api/analyze
+//  * ================================================== */
+// export const analyzeCode = async (req, res) => {
+//   try {
+//     const { inputType, content, useAI = false } = req.body;
+//     const userId = req.userId;
+
+//     /* ---------- Auth ---------- */
+//     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Unauthorized",
+//       });
+//     }
+
+//     /* ---------- Input Validation ---------- */
+//     if (!inputType || !content) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "inputType and content are required",
+//       });
+//     }
+
+//     if (!ALLOWED_INPUT_TYPES.has(inputType)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid inputType",
+//       });
+//     }
+
+//     if (typeof content !== "string" || content.length > MAX_CONTENT_LENGTH) {
+//       return res.status(413).json({
+//         success: false,
+//         message: "Content too large or invalid",
+//       });
+//     }
+
+//     /* ==================================================
+//      * SINGLE ORCHESTRATION CALL (AUTHORITATIVE)
+//      * ================================================== */
+//     const result = await runCombinedAnalysis({
+//       inputType,
+//       content,
+//       useAI,
+//     });
+
+//     if (!result.success) {
+//       return res.status(400).json(result);
+//     }
+
+//     /* ---------- Persist Analysis ---------- */
+//     const analysis = await Analysis.create({
+//       userId,
+//       inputType,
+//       contentHash: hashContent(content),
+//       overallRiskScore: result.analysis.overallRiskScore,
+//       vulnerabilities: result.analysis.vulnerabilities,
+//       processingTime: result.analysis.processingTime || 0,
+//       analysisDate: new Date(),
+//     });
+
+//     await User.updateOne(
+//       { _id: userId },
+//       { $inc: { analysisCount: 1 } }
+//     );
+
+//     /* ---------- Response ---------- */
+//     return res.status(200).json({
+//       success: true,
+//       mode: result.mode,
+//       analysis: {
+//         id: analysis._id,
+//         inputType,
+//         overallRiskScore: analysis.overallRiskScore,
+//         vulnerabilities: analysis.vulnerabilities,
+//         processingTime: analysis.processingTime,
+//         analysisDate: analysis.analysisDate,
+//       },
+//       ai: result.ai,
+//       ethics: result.ethics,
+//     });
+//   } catch (error) {
+//     console.error("Analysis error:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Analysis failed",
+//     });
+//   }
+// };
+
+// /* ==================================================
+//  * GET /api/analyze/history
+//  * ================================================== */
+// export const getAnalysisHistory = async (req, res) => {
+//   try {
+//     const userId = req.userId;
+
+//     if (!mongoose.Types.ObjectId.isValid(userId)) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Unauthorized",
+//       });
+//     }
+
+//     const limit = Math.min(Number(req.query.limit) || 10, 50);
+//     const page = Math.max(Number(req.query.page) || 1, 1);
+//     const skip = (page - 1) * limit;
+
+//     const [analyses, total] = await Promise.all([
+//       Analysis.find({ userId })
+//         .sort({ analysisDate: -1 })
+//         .skip(skip)
+//         .limit(limit)
+//         .select("-__v")
+//         .lean(),
+//       Analysis.countDocuments({ userId }),
+//     ]);
+
+//     return res.json({
+//       success: true,
+//       analyses: analyses.map((a) => ({
+//         id: a._id,
+//         inputType: a.inputType,
+//         overallRiskScore: a.overallRiskScore,
+//         vulnerabilityCount: a.vulnerabilities?.length || 0,
+//         analysisDate: a.analysisDate,
+//       })),
+//       pagination: {
+//         page,
+//         limit,
+//         total,
+//         pages: Math.ceil(total / limit),
+//       },
+//     });
+//   } catch (error) {
+//     console.error("History fetch error:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch analysis history",
+//     });
+//   }
+// };
+
+// /* ==================================================
+//  * GET /api/analyze/:id
+//  * ================================================== */
+// export const getAnalysisById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.userId;
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid analysis ID",
+//       });
+//     }
+
+//     const analysis = await Analysis.findOne({
+//       _id: id,
+//       userId,
+//     }).lean();
+
+//     if (!analysis) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Analysis not found",
+//       });
+//     }
+
+//     return res.json({
+//       success: true,
+//       analysis: {
+//         id: analysis._id,
+//         inputType: analysis.inputType,
+//         overallRiskScore: analysis.overallRiskScore,
+//         vulnerabilities: analysis.vulnerabilities,
+//         analysisDate: analysis.analysisDate,
+//         processingTime: analysis.processingTime,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Fetch analysis error:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch analysis",
+//     });
+//   }
+// };
+/**
+ * ANALYSIS CONTROLLER
+ * ===================
+ * - Normalizes engine output
+ * - Enforces DB schema contracts
+ * - NEVER executes code
+ */
 
 import Analysis from "../models/Analysis.js";
-import User from "../models/User.js";
 import { runCombinedAnalysis } from "../services/combinedAnalysis.service.js";
 
-/* --------------------------------------------------
- * Constants
- * -------------------------------------------------- */
-const ALLOWED_INPUT_TYPES = new Set(["code", "api", "sql", "config"]);
-const MAX_CONTENT_LENGTH = 100_000;
+/* ------------------------------------------------------
+ * Utilities
+ * ------------------------------------------------------ */
 
-const hashContent = (content) =>
-  crypto.createHash("sha256").update(content).digest("hex");
+/**
+ * Normalize severity to ENUM-safe value
+ */
+function normalizeSeverity(severity) {
+  if (!severity) return "LOW";
 
-/* ==================================================
+  const map = {
+    low: "LOW",
+    medium: "MEDIUM",
+    high: "HIGH",
+    critical: "CRITICAL",
+  };
+
+  return map[String(severity).toLowerCase()] || "LOW";
+}
+
+/**
+ * Normalize location object → string
+ */
+function normalizeLocation(location) {
+  if (!location) return null;
+
+  if (typeof location === "string") return location;
+
+  if (typeof location === "object") {
+    const line = location.line ?? "?";
+    const column = location.column ?? "?";
+    return `line:${line}, column:${column}`;
+  }
+
+  return String(location);
+}
+
+/* ------------------------------------------------------
  * POST /api/analyze
- * ================================================== */
-export const analyzeCode = async (req, res) => {
+ * ------------------------------------------------------ */
+export async function analyzeCode(req, res) {
   try {
-    const { inputType, content, useAI = false } = req.body;
-    const userId = req.userId;
+    const { content, language, inputType = "code", useAI = false } = req.body;
 
-    /* ---------- Auth ---------- */
-    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    /* ---------- Input Validation ---------- */
-    if (!inputType || !content) {
+    if (!content || typeof content !== "string") {
       return res.status(400).json({
         success: false,
-        message: "inputType and content are required",
+        error: "Invalid or empty code input",
       });
     }
 
-    if (!ALLOWED_INPUT_TYPES.has(inputType)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid inputType",
-      });
-    }
-
-    if (typeof content !== "string" || content.length > MAX_CONTENT_LENGTH) {
-      return res.status(413).json({
-        success: false,
-        message: "Content too large or invalid",
-      });
-    }
-
-    /* ==================================================
-     * SINGLE ORCHESTRATION CALL (AUTHORITATIVE)
-     * ================================================== */
+    /* ---------------- Run Analysis Engine ---------------- */
     const result = await runCombinedAnalysis({
       inputType,
       content,
+      language,
       useAI,
     });
 
     if (!result.success) {
-      return res.status(400).json(result);
+      return res.status(500).json(result);
     }
 
-    /* ---------- Persist Analysis ---------- */
+    /* ---------------- Normalize for DB ---------------- */
+    const normalizedVulns = result.analysis.vulnerabilities.map((v) => ({
+      id: v.id,
+      type: v.type,
+      severity: normalizeSeverity(v.severity),
+      description: v.description,
+      location: normalizeLocation(v.location),
+    }));
+
+    /* ---------------- Persist Analysis ---------------- */
     const analysis = await Analysis.create({
-      userId,
+      userId: req.user.id,
       inputType,
-      contentHash: hashContent(content),
+      language,
+      content,
       overallRiskScore: result.analysis.overallRiskScore,
-      vulnerabilities: result.analysis.vulnerabilities,
-      processingTime: result.analysis.processingTime || 0,
-      analysisDate: new Date(),
+      vulnerabilities: normalizedVulns,
+      processingTime: result.analysis.processingTime,
+      aiUsed: result.ai?.enabled || false,
     });
 
-    await User.updateOne(
-      { _id: userId },
-      { $inc: { analysisCount: 1 } }
-    );
-
-    /* ---------- Response ---------- */
-    return res.status(200).json({
+    return res.status(201).json({
       success: true,
-      mode: result.mode,
-      analysis: {
-        id: analysis._id,
-        inputType,
-        overallRiskScore: analysis.overallRiskScore,
-        vulnerabilities: analysis.vulnerabilities,
-        processingTime: analysis.processingTime,
-        analysisDate: analysis.analysisDate,
-      },
-      ai: result.ai,
-      ethics: result.ethics,
+      analysisId: analysis._id,
+      result,
     });
-  } catch (error) {
-    console.error("Analysis error:", error);
+  } catch (err) {
+    console.error("Analysis error:", err);
+
     return res.status(500).json({
       success: false,
-      message: "Analysis failed",
+      error: "Analysis failed",
+      details: err.message,
     });
   }
-};
+}
 
-/* ==================================================
+/* ------------------------------------------------------
  * GET /api/analyze/history
- * ================================================== */
-export const getAnalysisHistory = async (req, res) => {
-  try {
-    const userId = req.userId;
+ * ------------------------------------------------------ */
+export async function getAnalysisHistory(req, res) {
+  const history = await Analysis.find({ user: req.user.id })
+    .select("-content")
+    .sort({ createdAt: -1 })
+    .limit(20);
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
+  res.json({ success: true, history });
+}
 
-    const limit = Math.min(Number(req.query.limit) || 10, 50);
-    const page = Math.max(Number(req.query.page) || 1, 1);
-    const skip = (page - 1) * limit;
-
-    const [analyses, total] = await Promise.all([
-      Analysis.find({ userId })
-        .sort({ analysisDate: -1 })
-        .skip(skip)
-        .limit(limit)
-        .select("-__v")
-        .lean(),
-      Analysis.countDocuments({ userId }),
-    ]);
-
-    return res.json({
-      success: true,
-      analyses: analyses.map((a) => ({
-        id: a._id,
-        inputType: a.inputType,
-        overallRiskScore: a.overallRiskScore,
-        vulnerabilityCount: a.vulnerabilities?.length || 0,
-        analysisDate: a.analysisDate,
-      })),
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    console.error("History fetch error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch analysis history",
-    });
-  }
-};
-
-/* ==================================================
+/* ------------------------------------------------------
  * GET /api/analyze/:id
- * ================================================== */
-export const getAnalysisById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.userId;
+ * ------------------------------------------------------ */
+export async function getAnalysisById(req, res) {
+  const analysis = await Analysis.findOne({
+    _id: req.params.id,
+    user: req.user.id,
+  });
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid analysis ID",
-      });
-    }
-
-    const analysis = await Analysis.findOne({
-      _id: id,
-      userId,
-    }).lean();
-
-    if (!analysis) {
-      return res.status(404).json({
-        success: false,
-        message: "Analysis not found",
-      });
-    }
-
-    return res.json({
-      success: true,
-      analysis: {
-        id: analysis._id,
-        inputType: analysis.inputType,
-        overallRiskScore: analysis.overallRiskScore,
-        vulnerabilities: analysis.vulnerabilities,
-        analysisDate: analysis.analysisDate,
-        processingTime: analysis.processingTime,
-      },
-    });
-  } catch (error) {
-    console.error("Fetch analysis error:", error);
-    return res.status(500).json({
+  if (!analysis) {
+    return res.status(404).json({
       success: false,
-      message: "Failed to fetch analysis",
+      error: "Analysis not found",
     });
   }
-};
+
+  res.json({ success: true, analysis });
+}
