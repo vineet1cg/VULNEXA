@@ -1,35 +1,50 @@
 import { SEVERITY_WEIGHTS } from "./utils/constants.js";
-import { normalizeSeverity } from "./utils/normalizeSeverity.js";
 
 /**
  * RISK ENGINE
- * -----------
- * Produces a normalized risk score (0–100)
- * based on severity-weighted findings.
+ * ===========
+ * Deterministic risk score (0–100)
  */
+
+const HIGH_IMPACT_TYPES = new Set([
+  "Hardcoded Secret",
+  "Credential Exposure",
+  "API Key Exposure",
+  "Password Leak",
+  "SQL Injection",
+  "Command Injection",
+  "Remote Code Execution",
+]);
 
 export function calculateRiskScore(vulnerabilities = []) {
   if (!Array.isArray(vulnerabilities) || vulnerabilities.length === 0) {
     return 0;
   }
 
-  const totalWeight = vulnerabilities.reduce((sum, vuln) => {
-    // Normalize severity to ensure it matches specific casing in SEVERITY_WEIGHTS (e.g. "CRITICAL" -> "Critical")
-    const safeSeverity = normalizeSeverity(vuln?.severity);
-    const weight = SEVERITY_WEIGHTS[safeSeverity] || 0;
-    return sum + weight;
-  }, 0);
+  let totalScore = 0;
 
-  /**
-   * Normalization:
-   * - Prevents instant saturation
-   * - Keeps score proportional
-   * - Still rewards severity
-   */
+  for (const vuln of vulnerabilities) {
+    if (!vuln?.severity) continue;
+
+    // 🔥 FORCE FINAL ENUM NORMALIZATION
+    const severity =
+      String(vuln.severity).charAt(0).toUpperCase() +
+      String(vuln.severity).slice(1).toLowerCase();
+
+    const baseWeight = SEVERITY_WEIGHTS[severity] || 0;
+
+    let multiplier = 1;
+    if (HIGH_IMPACT_TYPES.has(vuln?.type)) {
+      multiplier = 1.5;
+    }
+
+    totalScore += baseWeight * multiplier;
+  }
+
   const maxPossible =
-    vulnerabilities.length * SEVERITY_WEIGHTS.Critical;
+    vulnerabilities.length * SEVERITY_WEIGHTS.Critical * 1.5;
 
-  const normalizedScore = (totalWeight / maxPossible) * 100;
+  const normalizedScore = (totalScore / maxPossible) * 100;
 
   return Math.min(Math.round(normalizedScore), 100);
 }

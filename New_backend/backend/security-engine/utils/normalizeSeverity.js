@@ -1,24 +1,27 @@
 /**
  * NORMALIZE SEVERITY (ENGINE → DB)
  * --------------------------------
- * Converts internal engine severities (ALL CAPS)
- * into DB- and dashboard-safe enums.
+ * Converts any engine / detector severity
+ * into DB-safe ENUM values.
  *
- * ENGINE: CRITICAL | HIGH | MEDIUM | LOW
- * DB/UI:  Critical | High | Medium | Low
+ * DB ENUM: CRITICAL | HIGH | MEDIUM | LOW
  */
 
 export function normalizeSeverity(severity) {
-  switch (severity) {
-    case "CRITICAL":
-      return "Critical";
-    case "HIGH":
-      return "High";
-    case "MEDIUM":
-      return "Medium";
-    case "LOW":
-      return "Low";
-    default:
-      return "Low";
-  }
+  if (!severity) return "LOW";
+
+  const map = {
+    CRITICAL: "CRITICAL",
+    HIGH: "HIGH",
+    MEDIUM: "MEDIUM",
+    LOW: "LOW",
+
+    // defensive handling (just in case)
+    critical: "CRITICAL",
+    high: "HIGH",
+    medium: "MEDIUM",
+    low: "LOW",
+  };
+
+  return map[String(severity)] || "LOW";
 }
