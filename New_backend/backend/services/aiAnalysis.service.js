@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const AI_URL = "http://192.168.56.1:5050/v1/chat/completions";
-const AI_MODEL = "gpt-4o-mini"; // or your local LLM name
+const AI_MODEL = "phi-mini"; // or your local LLM name
 
 export async function runAIAnalysis({ code, language, findings }) {
   const systemPrompt = `

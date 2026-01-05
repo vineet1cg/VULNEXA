@@ -1,296 +1,93 @@
-import mongoose from "mongoose";
-import crypto from "crypto";
+/**
+ * SERVER ENTRY POINT
+ * ==================
+ * EthicalGuard – Backend API
+ * - No attack execution
+ * - Static analysis only
+ * - AI advisory only
+ */
 
-import Analysis from "../models/Analysis.js";
-import User from "../models/User.js";
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import dotenv from "dotenv";
 
-/* ---------------- Security Engine ---------------- */
-import { analyzeInput } from "../security-engine/index.js";
-import { normalizeSeverity } from "../security-engine/utils/normalizeSeverity.js";
-import { calculateRiskScore } from "../security-engine/riskEngine.js";
+import connectDB from "./config/db.js";
+import errorHandler from "./middleware/errorHandler.js";
 
-/* ---------------- AI + Decision ---------------- */
-import { runAIAnalysis } from "./services/aiAnalysis.service.js";
-import { decideAnalysisMode } from "./services/decision.service.js";
+/* -------------------- Routes -------------------- */
+import authRoutes from "./routes/auth.routes.js";
+import analysisRoutes from "./routes/analysis.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
+import systemRoutes from "./routes/system.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
-/* --------------------------------------------------
- * Constants
- * -------------------------------------------------- */
-const ALLOWED_INPUT_TYPES = new Set(["code", "api", "sql", "config"]);
-const MAX_CONTENT_LENGTH = 100_000;
-const AI_RISK_THRESHOLD = 80;
 
-/* --------------------------------------------------
- * Utils
- * -------------------------------------------------- */
-const hashContent = (content) =>
-  crypto.createHash("sha256").update(content).digest("hex");
+/* -------------------- Init -------------------- */
+dotenv.config();
 
-/* --------------------------------------------------
- * Routes
- * -------------------------------------------------- */
+const app = express();
 
-app.use("/api/ai", aiRoutes);
+/* -------------------- Security Middleware -------------------- */
+app.use(helmet());
 
-/* ==================================================
- * POST /api/analyze
- * ================================================== */
-export const analyzeCode = async (req, res) => {
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "*",
+    credentials: true,
+  })
+);
+
+/* -------------------- Body Parsing -------------------- */
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+/* -------------------- Rate Limiting -------------------- */
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api", apiLimiter);
+
+/* -------------------- Health Check -------------------- */
+app.get("/", (_req, res) => {
+  res.json({
+    status: "ok",
+    service: "EthicalGuard Backend",
+    mode: "static-analysis-only",
+  });
+});
+
+/* -------------------- API Routes -------------------- */
+app.use("/api/auth", authRoutes);
+app.use("/api/analyze", analysisRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/system", systemRoutes);
+app.use("/api/ai", aiRoutes); // 🔥 AI chat + advisory endpoints
+
+/* -------------------- Error Handler -------------------- */
+app.use(errorHandler);
+
+/* -------------------- Server Start -------------------- */
+const PORT = process.env.PORT || 5000;
+
+async function startServer() {
   try {
-    const { inputType, content, useAI = false } = req.body;
-    const userId = req.userId;
+    await connectDB();
+    console.log("✅ MongoDB connected");
 
-    /* ---------- Auth ---------- */
-    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    /* ---------- Input Validation ---------- */
-    if (!inputType || !content) {
-      return res.status(400).json({
-        success: false,
-        message: "inputType and content are required",
-      });
-    }
-
-    if (!ALLOWED_INPUT_TYPES.has(inputType)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid inputType",
-      });
-    }
-
-    if (typeof content !== "string" || content.length > MAX_CONTENT_LENGTH) {
-      return res.status(413).json({
-        success: false,
-        message: "Content too large or invalid",
-      });
-    }
-
-    /* ==================================================
-     * AI-ONLY MODE (USER FORCED)
-     * ================================================== */
-    if (useAI === true) {
-      const aiMessage = await runAIAnalysis({
-        code: content,
-        language: inputType,
-        findings: [],
-      });
-
-      return res.status(200).json({
-        success: true,
-        mode: "AI_ONLY",
-        ai: {
-          enabled: true,
-          advisoryOnly: true,
-          message: aiMessage,
-        },
-        ethics: {
-          aiAdvisoryOnly: true,
-          notPersisted: true,
-        },
-      });
-    }
-
-    /* ==================================================
-     * SECURITY ENGINE (PRIMARY)
-     * ================================================== */
-    const engineResult = analyzeInput({ inputType, content });
-
-    if (!engineResult || engineResult.error) {
-      return res.status(400).json({
-        success: false,
-        message: engineResult?.error || "Analysis failed",
-      });
-    }
-
-    const {
-      vulnerabilities = [],
-      attackerView = [],
-      defenderFixes = [],
-      payloads = [],
-      impactAnalysis = null,
-      processingTime = 0,
-    } = engineResult;
-
-    /* ---------- Normalize Vulnerabilities ---------- */
-    const normalizedVulnerabilities = vulnerabilities.map((v, i) => ({
-      id: `vuln-${Date.now()}-${i}`,
-      name: v.type,
-      severity: normalizeSeverity(v.severity),
-      description: v.description,
-      attackerLogic: attackerView[i]?.abuseLogic || null,
-      defenderLogic: defenderFixes[i]?.secureFix || null,
-      secureCodeFix: defenderFixes[i]?.secureExample || null,
-    }));
-
-    /* ---------- Canonical Risk Score ---------- */
-    const overallRiskScore = calculateRiskScore(normalizedVulnerabilities);
-
-    /* ==================================================
-     * 🔥 NEW: SECURITY + AI DECISION (ADDITIVE)
-     * ================================================== */
-    const analysisMode = decideAnalysisMode({
-      useAI: false,
-      riskScore: overallRiskScore,
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
     });
-
-    let aiAdvisory = null;
-
-    if (analysisMode === "SECURITY_PLUS_AI") {
-      aiAdvisory = await runAIAnalysis({
-        code: content,
-        language: inputType,
-        findings: normalizedVulnerabilities,
-      });
-    }
-
-    /* ---------- Persist Security Analysis ---------- */
-    const analysis = await Analysis.create({
-      userId,
-      inputType,
-      contentHash: hashContent(content),
-      overallRiskScore,
-      vulnerabilities: normalizedVulnerabilities,
-      processingTime: Number(processingTime) || 0,
-      analysisDate: new Date(),
-    });
-
-    await User.updateOne({ _id: userId }, { $inc: { analysisCount: 1 } });
-
-    /* ---------- Response ---------- */
-    return res.status(200).json({
-      success: true,
-      mode: analysisMode,
-      aiRecommended: overallRiskScore >= AI_RISK_THRESHOLD,
-
-      analysis: {
-        id: analysis._id,
-        inputType,
-        overallRiskScore,
-        vulnerabilities: normalizedVulnerabilities,
-        attackerView,
-        defenderFixes,
-        simulatedPayloads: payloads,
-        impactAnalysis,
-        analysisDate: analysis.analysisDate,
-        processingTime: analysis.processingTime,
-      },
-
-      /* 🔥 NEW: AI ADVISORY (SAFE, OPTIONAL) */
-      ai: aiAdvisory
-        ? {
-            enabled: true,
-            advisoryOnly: true,
-            message: aiAdvisory,
-          }
-        : { enabled: false },
-    });
-  } catch (error) {
-    console.error("Analysis error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Analysis failed",
-    });
+  } catch (err) {
+    console.error("❌ Server startup failed:", err);
+    process.exit(1);
   }
-};
+}
 
-/* ==================================================
- * GET /api/analyze/history
- * ================================================== */
-export const getAnalysisHistory = async (req, res) => {
-  try {
-    const userId = req.userId;
-
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    const limit = Math.min(Number(req.query.limit) || 10, 50);
-    const page = Math.max(Number(req.query.page) || 1, 1);
-    const skip = (page - 1) * limit;
-
-    const [analyses, total] = await Promise.all([
-      Analysis.find({ userId })
-        .sort({ analysisDate: -1 })
-        .skip(skip)
-        .limit(limit)
-        .select("-__v")
-        .lean(),
-      Analysis.countDocuments({ userId }),
-    ]);
-
-    return res.json({
-      success: true,
-      analyses: analyses.map((a) => ({
-        id: a._id,
-        inputType: a.inputType,
-        overallRiskScore: a.overallRiskScore,
-        vulnerabilityCount: a.vulnerabilities?.length || 0,
-        analysisDate: a.analysisDate,
-      })),
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    console.error("History fetch error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch analysis history",
-    });
-  }
-};
-
-/* ==================================================
- * GET /api/analyze/:id
- * ================================================== */
-export const getAnalysisById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.userId;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid analysis ID",
-      });
-    }
-
-    const analysis = await Analysis.findOne({ _id: id, userId }).lean();
-
-    if (!analysis) {
-      return res.status(404).json({
-        success: false,
-        message: "Analysis not found",
-      });
-    }
-
-    return res.json({
-      success: true,
-      analysis: {
-        id: analysis._id,
-        inputType: analysis.inputType,
-        overallRiskScore: analysis.overallRiskScore,
-        vulnerabilities: analysis.vulnerabilities,
-        analysisDate: analysis.analysisDate,
-        processingTime: analysis.processingTime,
-      },
-    });
-  } catch (error) {
-    console.error("Fetch analysis error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch analysis",
-    });
-  }
-};
+startServer();
