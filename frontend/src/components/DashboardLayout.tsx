@@ -1,17 +1,19 @@
 import { LayoutDashboard, ShieldCheck, History, Terminal } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import ChatbotWidget from './ChatbotWidget';
 
 const SidebarItem = ({ icon: Icon, label, path, active }: any) => {
   const navigate = useNavigate();
   return (
     <div
       onClick={() => navigate(path)}
-      className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-300 group relative overflow-hidden ${active
-        ? 'bg-cyber-blue/10 text-cyber-blue shadow-subtle-blue ring-1 ring-cyber-blue/20'
+      className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-300 group relative overflow-hidden btn-underline btn-icon-shift ${active
+        ? 'bg-cyber-blue/10 text-cyber-blue ring-1 ring-cyber-blue/20'
         : 'text-cyber-slate hover:bg-white/5 hover:text-cyber-white active:scale-95'
-        } cyber-btn`}>
-      <Icon size={18} className={active ? 'text-cyber-blue animate-pulse' : 'text-cyber-slate group-hover:text-cyber-white transition-colors'} />
+        }`}>
+      <Icon size={18} className={active ? 'text-cyber-blue' : 'text-cyber-slate group-hover:text-cyber-white transition-colors'} />
       <span className="font-semibold text-sm tracking-tight">{label}</span>
     </div>
   );
@@ -33,10 +35,10 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
       <aside className="w-64 border-r border-white/5 bg-cyber-dark p-6 flex flex-col fixed h-full z-20">
         {/* Logo */}
         <div className="flex items-center space-x-3 mb-10 px-2 group cursor-pointer" onClick={() => navigate('/dashboard')}>
-          <div className="w-9 h-9 bg-cyber-blue rounded-lg flex items-center justify-center shadow-subtle-blue group-hover:shadow-[0_0_20px_rgb(var(--cyber-blue))] transition-all group-hover:rotate-12">
+          <div className="w-9 h-9 bg-cyber-blue rounded-lg flex items-center justify-center transition-all">
             <ShieldCheck size={20} className="text-cyber-black" />
           </div>
-          <span className="text-lg font-black tracking-tighter text-cyber-white">VULNEXA</span>
+          <span className="text-lg font-black tracking-tighter text-cyber-white">BLACKWAVE</span>
         </div>
 
         {/* Navigation */}
@@ -58,7 +60,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             <div>
               <p className="text-sm font-bold text-cyber-white">{user?.name || "Admin User"}</p>
               <p className="text-[10px] text-cyber-green flex items-center uppercase tracking-wider font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyber-green mr-2 animate-pulse" /> Online
+                <span className="w-1.5 h-1.5 rounded-full bg-cyber-green mr-2" /> Online
               </p>
             </div>
           </div>
@@ -66,11 +68,17 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 p-8 relative min-h-screen">
+      <motion.main
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="flex-1 ml-64 p-8 relative min-h-screen"
+      >
         <div className="relative z-10 max-w-7xl mx-auto">
           {children}
         </div>
-      </main>
+      </motion.main>
+      <ChatbotWidget />
     </div>
   );
 };

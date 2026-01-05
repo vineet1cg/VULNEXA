@@ -343,12 +343,7 @@ export const AnalysisPage = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => startScan("manual")}
                 disabled={status === "SCANNING" || !code}
-                className={`w-full py-4 rounded-xl font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-3 transition-all relative overflow-hidden group ${status === "SCANNING"
-                  ? "bg-gray-800 text-gray-500"
-                  : isDanger
-                    ? "bg-red-600 text-white shadow-lg shadow-red-900/20"
-                    : "bg-gradient-to-r from-cyber-blue to-cyber-purple text-white shadow-lg shadow-blue-900/20 cyber-btn"
-                  } ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`btn ${status === "SCANNING" ? "" : "btn-primary"} btn-advanced btn-tilt btn-icon-shift btn-scanline btn-border-beam w-full ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {status === "SCANNING" ? (
                   <RefreshCw className="animate-spin" size={20} />
@@ -362,12 +357,7 @@ export const AnalysisPage = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => startScan("ai")}
                 disabled={status === "SCANNING" || !code}
-                className={`w-full py-4 rounded-xl font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-3 transition-all relative overflow-hidden group ${status === "SCANNING"
-                  ? "bg-gray-800 text-gray-500"
-                  : isDanger
-                    ? "bg-red-600 text-white shadow-lg shadow-red-900/20"
-                    : "bg-gradient-to-r from-cyber-purple to-cyber-blue text-white shadow-lg shadow-purple-900/20 cyber-btn"
-                  } ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`btn ${status === "SCANNING" ? "" : "btn-secondary"} btn-underline btn-icon-shift btn-scanline btn-border-beam w-full ${!code ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {status === "SCANNING" ? (
                   <RefreshCw className="animate-spin" size={20} />
