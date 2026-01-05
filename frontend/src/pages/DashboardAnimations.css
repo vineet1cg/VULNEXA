@@ -448,7 +448,7 @@
 }
 .btn[disabled] {
   opacity: 0.5;
-  cursor: not-allowed;
+
 }
 
 .btn-primary {
@@ -583,4 +583,38 @@
 .btn-icon-shift:hover svg {
   transform: translateX(2px);
   opacity: 0.95;
+}
+/* ========================================= */
+/* 🖱️ ULTIMATE CURSOR FIX                    */
+/* ========================================= */
+
+
+
+
+
+2. The Custom Cursor (Fixed Position) */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #3b82f6;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2147483647;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.2s ease,
+    height 0.2s ease,
+    background-color 0.2s ease;
+  mix-blend-mode: exclusion;
+}
+
+ .custom-cursor.hovered {
+  width: 46px;
+  height: 46px;
+  background-color: rgba(59, 130, 246, 0.18);
+  border-color: transparent;
+  backdrop-filter: blur(2px);
 }

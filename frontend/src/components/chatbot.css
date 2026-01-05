@@ -2,6 +2,14 @@
  * Chatbot Widget Styles
  * Follows strict positioning and styling rules
  */
+
+ /* FORCE CURSOR VISIBILITY — SAFETY RESET */
+#chatbot-widget,
+#chatbot-widget * {
+  cursor: auto !important;
+}
+
+
 :root {
     --primary-color: #2563eb; /* Professional Blue */
     --primary-hover: #1d4ed8;
