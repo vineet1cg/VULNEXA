@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, animate } from "framer-motion";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { GlassCard } from "../components/GlassCard";
+import { CodeAnalysisGraph } from "../components/CodeAnalysisGraph";
 import {
   Terminal,
   ShieldAlert,
@@ -17,9 +18,10 @@ import {
   Bug,
   Fingerprint,
   FileText,
+  Network,
 } from "lucide-react";
 import { analysisApi } from "../api/analysis";
-import type { AnalysisResult } from "../types/analysis";
+import type { AnalysisResult, Vulnerability } from "../types/analysis";
 
 export const AnalysisPage = () => {
   // --- STATE MANAGEMENT ---
@@ -44,6 +46,81 @@ export const AnalysisPage = () => {
   // UI Helpers
   const isDanger = getRiskScore(result) > 0;
   const terminalEndRef = useRef<null | HTMLDivElement>(null);
+
+  // Transform analysis result to graph data
+  const transformToGraphData = (analysisResult: AnalysisResult | null) => {
+    if (!analysisResult) return null;
+
+    const nodes: Array<{
+      id: string;
+      label: string;
+      type: 'file' | 'function' | 'vulnerability' | 'dependency';
+      risk: 'low' | 'medium' | 'high' | 'critical';
+    }> = [];
+    const edges: Array<{
+      from: string;
+      to: string;
+      type: 'import' | 'call' | 'dependency';
+    }> = [];
+
+    // Add main code node
+    const codeNodeId = 'analyzed_code';
+    nodes.push({
+      id: codeNodeId,
+      label: 'Analyzed Code',
+      type: 'file',
+      risk: isDanger ? 'high' : 'low',
+    });
+
+    // Add vulnerability nodes and connect them to code
+    if (analysisResult.vulnerabilities && analysisResult.vulnerabilities.length > 0) {
+      analysisResult.vulnerabilities.forEach((vuln: Vulnerability, index: number) => {
+        const vulnId = `vuln_${index}`;
+        const severityStr = (vuln.severity || 'Low').toLowerCase();
+        const severity = (severityStr === 'critical' ? 'critical' :
+                         severityStr === 'high' ? 'high' :
+                         severityStr === 'medium' ? 'medium' : 'low') as 'low' | 'medium' | 'high' | 'critical';
+        
+        nodes.push({
+          id: vulnId,
+          label: vuln.type || vuln.name || `Vulnerability ${index + 1}`,
+          type: 'vulnerability',
+          risk: severity,
+        });
+
+        // Connect vulnerability to code
+        edges.push({
+          from: codeNodeId,
+          to: vulnId,
+          type: 'dependency',
+        });
+      });
+    }
+
+    // Add risk score node if there are vulnerabilities
+    if (nodes.length > 1) {
+      const riskNodeId = 'risk_score';
+      const riskLevel = getRiskScore(analysisResult) > 7 ? 'critical' : 
+                       getRiskScore(analysisResult) > 4 ? 'high' : 
+                       getRiskScore(analysisResult) > 2 ? 'medium' : 'low';
+      
+      nodes.push({
+        id: riskNodeId,
+        label: `Risk: ${getRiskScore(analysisResult).toFixed(1)}`,
+        type: 'dependency',
+        risk: riskLevel,
+      });
+
+      // Connect risk score to code
+      edges.push({
+        from: codeNodeId,
+        to: riskNodeId,
+        type: 'dependency',
+      });
+    }
+
+    return { nodes, edges };
+  };
 
   // --- ACTIONS ---
   const startScan = async (scanMode: "manual" | "ai" = "manual") => {
@@ -571,6 +648,42 @@ export const AnalysisPage = () => {
           </GlassCard>
         </div>
       </div>
+
+      {/* CODE ANALYSIS GRAPH - Shows after analysis is complete */}
+      {status === "FINISHED" && result && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6"
+        >
+          <GlassCard className="relative overflow-hidden">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center group">
+                <Network size={14} className="mr-2 text-cyber-blue group-hover:animate-pulse" />
+                <span className="group-hover:text-gradient-animate transition-all duration-300">
+                  Code Analysis Graph
+                </span>
+              </h3>
+              <div className="text-[9px] text-gray-600 font-mono">
+                {result.vulnerabilities?.length || 0} vulnerabilities detected
+              </div>
+            </div>
+            
+            <div className="h-[500px] w-full bg-black/40 rounded-xl border border-white/5 p-4">
+              <CodeAnalysisGraph
+                width={800}
+                height={500}
+                data={transformToGraphData(result) || undefined}
+              />
+            </div>
+            
+            <div className="mt-4 text-[9px] text-gray-500 font-mono text-center">
+              Interactive visualization of code structure and detected vulnerabilities
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
     </DashboardLayout>
   );
 };
