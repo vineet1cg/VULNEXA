@@ -22,7 +22,7 @@ export const GlassCard = ({ children, className = "" }: GlassCardProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       onMouseMove={handleMouseMove}
-      className={`group relative bg-cyber-dark/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-glass-pro overflow-hidden transition-all duration-300 hover:border-cyber-blue/30 ${className}`}
+      className={`group relative bg-cyber-dark/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-glass-pro overflow-hidden transition-all duration-300 hover:border-cyber-blue/30 glass-card-hover card-highlight ${className}`}
     >
       {/* HUD Corners */}
       <div className="hud-corner hud-tl rounded-tl-2xl" />
