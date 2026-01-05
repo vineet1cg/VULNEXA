@@ -36,7 +36,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
           <div className="w-9 h-9 bg-cyber-blue rounded-lg flex items-center justify-center shadow-subtle-blue group-hover:shadow-[0_0_20px_rgb(var(--cyber-blue))] transition-all group-hover:rotate-12">
             <ShieldCheck size={20} className="text-cyber-black" />
           </div>
-          <span className="text-lg font-black tracking-tighter text-cyber-white">VULNEXA</span>
+          <span className="text-lg font-black tracking-tighter text-cyber-white">BLACKWAVE</span>
         </div>
 
         {/* Navigation */}

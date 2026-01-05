@@ -24,7 +24,7 @@ export const LoginPage = () => {
             </div>
           </div>
 
-          <h1 className="text-3xl font-black tracking-tighter text-white">VULNEXA<span className="text-cyber-blue">_CORE</span></h1>
+          <h1 className="text-3xl font-black tracking-tighter text-white">BLACKWAVE<span className="text-cyber-blue">_CORE</span></h1>
           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-2 flex items-center justify-center">
             <Lock size={10} className="mr-1" /> Secure Access Gateway
           </p>

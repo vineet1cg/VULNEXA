@@ -193,11 +193,11 @@ export const DashboardPage = () => {
         <motion.div variants={item} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-black tracking-tighter text-cyber-white">
-              VULNEXA_COMMAND_CENTER
+              BLACKWAVE_COMMAND_CENTER
             </h1>
             <p className="text-cyber-slate text-xs font-bold uppercase tracking-[0.3em] mt-1 flex items-center">
               <span className="w-2 h-2 bg-cyber-green rounded-full mr-2 animate-pulse shadow-[0_0_10px_rgb(var(--cyber-green))]" />
-              VULNEXA_CORE v4.0.0 // USER:{" "}
+              BLACKWAVE_CORE v4.0.0 // USER:{" "}
               {user?.name?.toUpperCase() || "ADMIN"}
             </p>
           </div>
