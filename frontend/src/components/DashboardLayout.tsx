@@ -1,8 +1,10 @@
 import { LayoutDashboard, ShieldCheck, History, Terminal, ArrowLeft, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ChatbotWidget from './ChatbotWidget';
+import { ProfileModal } from './ProfileModal';
 
 const SidebarItem = ({ icon: Icon, label, path, active }: any) => {
   const navigate = useNavigate();
@@ -23,6 +25,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleSignOut = async () => {
     await logout();
@@ -56,7 +59,10 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
         {/* User Profile */}
         <div className="mt-auto border-t border-white/5 pt-6">
-          <div className="flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+          <div 
+            onClick={() => setIsProfileOpen(true)}
+            className="flex items-center space-x-3 mb-4 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+          >
             <div className="w-10 h-10 rounded-lg bg-cyber-dark-lighter border border-white/10 flex items-center justify-center text-cyber-blue font-black text-xs">
               {getInitials(user?.name || "Admin User")}
             </div>
@@ -100,6 +106,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         </div>
       </motion.main>
       <ChatbotWidget />
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 };

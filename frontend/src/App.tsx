@@ -4,6 +4,8 @@ import LandingPage from "./pages/LandingPage";
 import { DashboardPage } from "./pages/DashboardPage"; // ✅ FIXED: Added { }
 import { AnalysisPage } from "./pages/AnalysisPage";   // ✅ FIXED: Added { }
 import HistoryPage from "./pages/HistoryPage";         // Kept as default (unless you updated it too)
+import { BlueTeamPage } from "./pages/BlueTeamPage";
+import { RedTeamPage } from "./pages/RedTeamPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./pages/DashboardAnimations.css";
 
@@ -39,6 +41,24 @@ function App() {
           element={
             <ProtectedRoute>
               <HistoryPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/blue-team"
+          element={
+            <ProtectedRoute>
+              <BlueTeamPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/red-team"
+          element={
+            <ProtectedRoute>
+              <RedTeamPage />
             </ProtectedRoute>
           }
         />

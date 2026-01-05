@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Shield, Target } from 'lucide-react';
 import { CodeAnalysisGraph } from '../components/CodeAnalysisGraph';
 import './LandingPage.css';
 
@@ -261,21 +262,26 @@ const LandingPage: React.FC = () => {
 
                     <div className="reveal-mask flex flex-col sm:flex-row gap-6 justify-center">
                         <button 
-                            onClick={() => navigate('/login')} 
-                            className="group relative px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 hover:scale-105 transition-all overflow-hidden cursor-pointer shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                            onClick={() => navigate('/blue-team')} 
+                            className="group relative px-10 py-5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 hover:scale-105 transition-all overflow-hidden cursor-pointer shadow-[0_0_30px_rgba(37,99,235,0.5)]"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity" />
-                            <span className="relative z-10">BLUE TEAM</span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-500 opacity-0 group-hover:opacity-30 transition-opacity" />
+                            <div className="relative z-10 flex items-center space-x-2">
+                                <Shield className="w-5 h-5" />
+                                <span>BLUE TEAM</span>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-400/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                         </button>
                         <button 
-                            onClick={() => {
-                                // Red Team functionality - will be implemented later
-                                console.log('Red Team clicked');
-                            }}
-                            className="group relative px-8 py-4 bg-red-600 text-white font-bold rounded-lg hover:bg-red-500 hover:scale-105 transition-all overflow-hidden cursor-pointer shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+                            onClick={() => navigate('/red-team')}
+                            className="group relative px-10 py-5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-500 hover:scale-105 transition-all overflow-hidden cursor-pointer shadow-[0_0_30px_rgba(239,68,68,0.5)]"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 opacity-0 group-hover:opacity-20 transition-opacity" />
-                            <span className="relative z-10">RED TEAM</span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 opacity-0 group-hover:opacity-30 transition-opacity" />
+                            <div className="relative z-10 flex items-center space-x-2">
+                                <Target className="w-5 h-5" />
+                                <span>RED TEAM</span>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-400/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                         </button>
                     </div>
                 </div>
