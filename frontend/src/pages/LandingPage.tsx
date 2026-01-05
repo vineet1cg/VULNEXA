@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CodeAnalysisGraph } from '../components/CodeAnalysisGraph';
 import './LandingPage.css';
 
 const LandingPage: React.FC = () => {
@@ -327,9 +328,14 @@ const LandingPage: React.FC = () => {
                                     </div>
                                     <div className="glass-card p-6 flex items-center justify-center relative overflow-hidden">
                                         <div className="absolute inset-0 bg-blue-500/5 animate-pulse" />
-                                        <div className="text-center z-10">
-                                            <div className="text-5xl mb-4 opacity-80 animate-bounce">🛡️</div>
-                                            <div className="text-xs font-mono text-blue-300">GRAPH_VISUALIZATION_ACTIVE</div>
+                                        <div className="w-full h-full z-10">
+                                            <div className="text-[10px] font-mono text-blue-300 mb-2 text-center">
+                                                CODE_ANALYSIS_GRAPH
+                                            </div>
+                                            <CodeAnalysisGraph 
+                                                width={400} 
+                                                height={280}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -370,13 +376,68 @@ const LandingPage: React.FC = () => {
             <section id="architecture" className="py-32 px-6 border-t border-white/5 bg-black/20">
                 <div className="max-w-6xl mx-auto text-center">
                     <h2 className="text-3xl font-bold text-white mb-16">System Architecture</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                        {['INGESTION', 'ANALYSIS', 'SIMULATION', 'REMEDIATION'].map((step, i) => (
-                            <div key={i} className="reveal-mask glass-card p-6 rounded-lg relative hover:-translate-y-2 transition-transform">
-                                <div className="text-xs font-mono text-blue-400 mb-2">0{i + 1}. PHASE</div>
-                                <h4 className="font-bold text-white">{step}</h4>
-                            </div>
-                        ))}
+                    <div className="relative">
+                        {/* Desktop: Horizontal flow with arrows */}
+                        <div className="hidden md:flex items-center justify-center gap-4">
+                            {['INGESTION', 'ANALYSIS', 'SIMULATION', 'REMEDIATION'].map((step, i) => (
+                                <React.Fragment key={i}>
+                                    <div className="reveal-mask glass-card p-6 rounded-lg relative hover:-translate-y-2 transition-transform min-w-[180px]">
+                                        <div className="text-xs font-mono text-blue-400 mb-2">0{i + 1}. PHASE</div>
+                                        <h4 className="font-bold text-white">{step}</h4>
+                                        {/* Status indicator */}
+                                        <div className="absolute top-2 right-2 w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
+                                    </div>
+                                    {/* Arrow between steps - only show if not last */}
+                                    {i < 3 && (
+                                        <div className="flex items-center justify-center architecture-arrow">
+                                            <svg 
+                                                className="w-12 h-12 text-blue-500" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path 
+                                                    strokeLinecap="round" 
+                                                    strokeLinejoin="round" 
+                                                    strokeWidth={2.5} 
+                                                    d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                                                />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </div>
+                        {/* Mobile: Vertical flow with arrows */}
+                        <div className="md:hidden space-y-6">
+                            {['INGESTION', 'ANALYSIS', 'SIMULATION', 'REMEDIATION'].map((step, i) => (
+                                <React.Fragment key={i}>
+                                    <div className="reveal-mask glass-card p-6 rounded-lg relative hover:-translate-y-2 transition-transform">
+                                        <div className="text-xs font-mono text-blue-400 mb-2">0{i + 1}. PHASE</div>
+                                        <h4 className="font-bold text-white">{step}</h4>
+                                        <div className="absolute top-2 right-2 w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
+                                    </div>
+                                    {/* Vertical arrow between steps - only show if not last */}
+                                    {i < 3 && (
+                                        <div className="flex items-center justify-center py-2 architecture-arrow-vertical">
+                                            <svg 
+                                                className="w-8 h-8 text-blue-500" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path 
+                                                    strokeLinecap="round" 
+                                                    strokeLinejoin="round" 
+                                                    strokeWidth={2.5} 
+                                                    d="M19 14l-5 5m0 0l-5-5m5 5V6" 
+                                                />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>

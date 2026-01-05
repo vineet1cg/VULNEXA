@@ -693,3 +693,37 @@ nav::before {
   .stats-grid { flex-direction: column; gap: 40px; }
   .stat-number { font-size: 2.5rem; }
 }
+
+/* --- ARCHITECTURE ARROWS --- */
+.architecture-arrow {
+  animation: arrow-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
+}
+
+@keyframes arrow-pulse {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: translateX(0);
+  }
+  50% { 
+    opacity: 1;
+    transform: translateX(4px);
+  }
+}
+
+/* Vertical arrow for mobile */
+.architecture-arrow-vertical {
+  animation: arrow-pulse-vertical 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6));
+}
+
+@keyframes arrow-pulse-vertical {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: translateY(0);
+  }
+  50% { 
+    opacity: 1;
+    transform: translateY(4px);
+  }
+}
