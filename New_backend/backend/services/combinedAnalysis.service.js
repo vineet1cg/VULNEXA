@@ -10,6 +10,7 @@
 import { analyzeInput } from "../security-engine/index.js";
 import { runAIAnalysis } from "./aiAnalysis.service.js";
 import { decideAnalysisMode } from "./decision.service.js";
+import { normalizeSeverity } from "../security-engine/utils/normalizeSeverity.js";
 
 /* ---------------------------------------------
  * Utility: deterministic vulnerability ID
@@ -57,11 +58,12 @@ export async function runCombinedAnalysis({
 
   /* ==================================================
    * STEP 2: Normalize vulnerabilities (PURE OBJECTS)
+   * 🔒 FIX: Severity normalization enforced here
    * ================================================== */
   const normalizedVulnerabilities = vulnerabilities.map((v, i) => ({
     id: generateVulnId(v, i),
     type: v.type,
-    severity: v.severity,
+    severity: normalizeSeverity(v.severity), // ✅ FIXED
     description: v.description,
     location: v.location || null,
   }));

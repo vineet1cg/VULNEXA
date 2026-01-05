@@ -1,6 +1,6 @@
 /**
  * Detects hardcoded secrets in source code or configuration files.
- * This is a static, pattern-based detection and does not validate secret authenticity.
+ * Static, pattern-based detection only.
  */
 export function detectHardcodedSecrets(normalizedInput) {
   if (!normalizedInput || !["code", "config"].includes(normalizedInput.type)) {
@@ -12,15 +12,15 @@ export function detectHardcodedSecrets(normalizedInput) {
 
   const patterns = [
     {
-      regex: /(api[_-]?key|apikey)\s*=\s*['"][^'"]{10,}['"]/i,
+      regex: /\b(api[_-]?key|apikey)\b\s*[:=]\s*['"][^'"]{10,}['"]/i,
       label: "API Key",
     },
     {
-      regex: /(secret|token|password|passwd|pwd)\s*=\s*['"][^'"]{6,}['"]/i,
+      regex: /\b(secret|token|password|passwd|pwd)\b\s*[:=]\s*['"][^'"]{6,}['"]/i,
       label: "Secret or Password",
     },
     {
-      regex: /(aws|amazon)[_-]?(secret|access)[_-]?key\s*=\s*['"][^'"]+['"]/i,
+      regex: /\b(aws|amazon)[_-]?(secret|access)[_-]?key\b\s*[:=]\s*['"][^'"]+['"]/i,
       label: "AWS Credential",
     },
   ];
@@ -31,7 +31,7 @@ export function detectHardcodedSecrets(normalizedInput) {
     if (match) {
       issues.push({
         type: "Hardcoded Secret",
-        severity: "HIGH", // ✅ uppercase, dashboard-safe
+        severity: "high", // ✅ engine-level, normalized later
         owasp: "A02:2021 - Cryptographic Failures",
         description: `A ${label} appears to be hardcoded in the source code or configuration file.`,
         recommendation:
@@ -39,11 +39,8 @@ export function detectHardcodedSecrets(normalizedInput) {
         location: {
           context: match[0],
           source: normalizedInput.type,
-          
         },
       });
-
-      break; // one finding is sufficient
     }
   }
 
