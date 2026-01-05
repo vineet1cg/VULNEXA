@@ -203,15 +203,24 @@ export const DashboardPage = () => {
   if (loading) {
   return (
     <DashboardLayout>
-      <div className="h-[80vh] flex flex-col items-center justify-center">
-        <div className="w-16 h-16 border-4 border-cyber-blue/30 border-t-cyber-blue rounded-full animate-spin mb-4" />
-        <p className="text-cyber-blue font-mono text-sm tracking-widest animate-pulse">
-          ESTABLISHING SECURE CONNECTION...
-        </p>
-      </div>
-    </DashboardLayout>
-  );
-}
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="space-y-8"
+      >
+        {/* --- HEADER --- */}
+        <motion.div variants={item} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-black tracking-tighter text-cyber-white">
+              BLACKWAVE_COMMAND_CENTER
+            </h1>
+            <p className="text-cyber-slate text-xs font-bold uppercase tracking-[0.3em] mt-1 flex items-center">
+              <span className="w-2 h-2 bg-cyber-green rounded-full mr-2 animate-pulse shadow-[0_0_10px_rgb(var(--cyber-green))]" />
+              BLACKWAVE_CORE v4.0.0 // USER:{" "}
+              {user?.name?.toUpperCase() || "ADMIN"}
+            </p>
+          </div>
 
 
   return (
