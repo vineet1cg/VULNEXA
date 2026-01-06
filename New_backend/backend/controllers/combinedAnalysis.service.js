@@ -33,10 +33,7 @@ export async function runCombinedAnalysis({
   });
 
   // ✅ SAFE DEBUG LOG
-  console.log(
-    "[DEBUG] Engine Result:",
-    JSON.stringify(engineResult, null, 2)
-  );
+  console.log("[DEBUG] Engine Result:", JSON.stringify(engineResult, null, 2));
 
   if (!engineResult || engineResult.error) {
     return {
@@ -57,26 +54,25 @@ export async function runCombinedAnalysis({
   /* ==================================================
    * STEP 2: Normalize vulnerabilities (DB-safe)
    * ================================================== */
- const normalizedVulnerabilities = vulnerabilities.map((v, i) => ({
-  id: `vuln-${Date.now()}-${i}`,
+  const normalizedVulnerabilities = vulnerabilities.map((v, i) => ({
+    id: `vuln-${Date.now()}-${i}`,
 
-  // ✅ REQUIRED BY DB
-  type: v.type || "Unknown",
+    // ✅ REQUIRED BY DB
+    type: v.type || "Unknown",
 
-  // (optional UI-friendly name if you want)
-  name: v.type || "Unknown",
+    // (optional UI-friendly name if you want)
+    name: v.type || "Unknown",
 
-  // ✅ ENUM SAFE
-  severity: normalizeSeverity(v.severity),
+    // ✅ ENUM SAFE
+    severity: normalizeSeverity(v.severity),
 
-  description: v.description || "",
-  attackerLogic: attackerView[i]?.abuseLogic || null,
-  defenderLogic: defenderFixes[i]?.secureFix || null,
-  secureCodeFix: defenderFixes[i]?.secureExample || null,
-  simulatedPayload: payloads?.[i] || null,
-  impact: impactAnalysis?.[i] || null,
-}));
-
+    description: v.description || "",
+    attackerLogic: attackerView[i]?.abuseLogic || null,
+    defenderLogic: defenderFixes[i]?.secureFix || null,
+    secureCodeFix: defenderFixes[i]?.secureExample || null,
+    simulatedPayload: payloads?.[i] || null,
+    impact: impactAnalysis?.[i] || null,
+  }));
 
   /* ==================================================
    * STEP 3: Risk Score
@@ -128,7 +124,9 @@ export async function runCombinedAnalysis({
       ? {
           enabled: true,
           advisoryOnly: true,
-          message: aiAdvisory,
+          explanation: aiAdvisory.explanation || null,
+          codeSuggestions: aiAdvisory.codeSuggestions || [],
+          hypotheses: aiAdvisory.hypotheses || [],
         }
       : { enabled: false },
 
